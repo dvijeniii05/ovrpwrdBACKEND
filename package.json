@@ -4,7 +4,7 @@
   "description": "backend for OVRPWRD.app",
   "main": "index.js",
   "scripts": {
-    "start": "node ./build/app.js"
+    "start": "npx tsc && node ./build/app.js"
   },
   "author": "dvijeniii05",
   "license": "ISC",
