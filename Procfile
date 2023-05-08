@@ -1,1 +1,1 @@
-worker: npm run
+worker: node ./build/steamauth.js
