@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const node_steam_openid_1 = __importDefault(require("node-steam-openid"));
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
+const getRecentMatches_1 = require("./routes/getRecentMatches");
 const steam = new node_steam_openid_1.default({
     realm: "http://localhost:3000",
     returnUrl: "http://localhost:3000/auth/steam/authenticate",
@@ -23,6 +24,7 @@ const steam = new node_steam_openid_1.default({
 const app = (0, express_1.default)();
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
+app.use("/recentMatches", getRecentMatches_1.router);
 app.get("/steamid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("REQ", req.query.id);
     res.render("home");

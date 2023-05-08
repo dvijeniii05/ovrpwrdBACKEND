@@ -1,6 +1,7 @@
 import express from "express";
 import SteamAuth from "node-steam-openid";
 import BigNumber from "bignumber.js";
+import { router as getRecentMatches } from "./routes/getRecentMatches";
 
 const steam = new SteamAuth({
   realm: "http://localhost:3000", // Site name displayed to users on logon
@@ -11,6 +12,8 @@ const steam = new SteamAuth({
 const app = express();
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
+
+app.use("/recentMatches", getRecentMatches);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);
