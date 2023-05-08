@@ -1,1 +1,1 @@
-worker: node ./build/steamauth.js
+worker: node ./build/steamAuth.js
