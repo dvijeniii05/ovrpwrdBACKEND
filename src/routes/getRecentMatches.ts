@@ -36,7 +36,7 @@ router.get("/getMatches/:steamID32/:startDateTime", async (req, res) => {
       headers: { Authorization: `Bearer ${startzBearerToken}` },
     }
   );
-  console.log(recentMatches.data[0]);
+  // console.log(recentMatches.data[0]);
 
   res.status(200).send(recentMatches.data);
 });
