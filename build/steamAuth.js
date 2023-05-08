@@ -50,4 +50,4 @@ app.get("/auth/steam/authenticate", (req, res) => __awaiter(void 0, void 0, void
         console.error(error);
     }
 }));
-app.listen(3000, () => console.log("Listenning to PORT:3000"));
+app.listen(process.env.PORT || 3000, () => console.log("Listenning to PORT:3000"));
