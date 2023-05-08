@@ -4,8 +4,8 @@
   "description": "backend for OVRPWRD.app",
   "main": "index.js",
   "scripts": {
-    "start": "npx tsc && nodemon ./build/steamauth.js",
-    "run": "node ./build/steamauth.js"
+    "start": "node ./build/steamAuth.js",
+    "run": "npx tsc && nodemon ./build/steamAuth.js"
   },
   "author": "dvijeniii05",
   "license": "ISC",
