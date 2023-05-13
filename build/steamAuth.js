@@ -17,8 +17,8 @@ const node_steam_openid_1 = __importDefault(require("node-steam-openid"));
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
 const getRecentMatches_1 = require("./routes/getRecentMatches");
 const steam = new node_steam_openid_1.default({
-    realm: "http://localhost:3000",
-    returnUrl: "http://localhost:3000/auth/steam/authenticate",
+    realm: "https://ovrpwrd-backend.herokuapp.com/",
+    returnUrl: "https://ovrpwrd-backend.herokuapp.com/auth/steam/authenticate",
     apiKey: "D8B16689041256E8528ED5CFD72E1BFC", // Steam API key
 });
 const app = (0, express_1.default)();

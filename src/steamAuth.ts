@@ -4,9 +4,8 @@ import BigNumber from "bignumber.js";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
 
 const steam = new SteamAuth({
-  realm: "https://sleepy-badlands-00627.herokuapp.com/", // Site name displayed to users on logon
-  returnUrl:
-    "https://sleepy-badlands-00627.herokuapp.com/auth/steam/authenticate", // Your return route
+  realm: "https://ovrpwrd-backend.herokuapp.com/", // Site name displayed to users on logon
+  returnUrl: "https://ovrpwrd-backend.herokuapp.com/auth/steam/authenticate", // Your return route
   apiKey: "D8B16689041256E8528ED5CFD72E1BFC", // Steam API key
 });
 
