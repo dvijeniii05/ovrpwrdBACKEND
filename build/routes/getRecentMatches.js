@@ -45,9 +45,9 @@ exports.router.get("/getMatches/:steamID32/:startDateTime", (req, res) => __awai
 }));
 exports.router.get("/getCustomMatch/:matchID", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { matchID } = req.params;
-    const customMatchData = yield axios_1.default.get(`${stratzRest}/match?matchId=${matchID}`, {
+    const customMatchData = yield axios_1.default.get(`${stratzRest}/match/${matchID}`, {
         headers: { Authorization: `Bearer ${startzBearerToken}` },
     });
-    const { startDateTime, id } = customMatchData.data[0];
+    const { startDateTime, id } = customMatchData.data;
     res.status(200).send({ startDateTime, id });
 }));
