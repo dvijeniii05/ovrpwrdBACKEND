@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const node_steam_openid_1 = __importDefault(require("node-steam-openid"));
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
 const getRecentMatches_1 = require("./routes/getRecentMatches");
+const getLeagues_1 = require("./routes/getLeagues");
 const steam = new node_steam_openid_1.default({
     realm: "https://ovrpwrd-backend.herokuapp.com/",
     returnUrl: "https://ovrpwrd-backend.herokuapp.com/auth/steam/authenticate",
@@ -25,6 +26,7 @@ const app = (0, express_1.default)();
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use("/recentMatches", getRecentMatches_1.router);
+app.use("/currentLeagues", getLeagues_1.router);
 app.get("/steamid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("REQ", req.query.id);
     res.render("home");

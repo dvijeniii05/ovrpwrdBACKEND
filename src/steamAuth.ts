@@ -2,6 +2,7 @@ import express from "express";
 import SteamAuth from "node-steam-openid";
 import BigNumber from "bignumber.js";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
+import { router as getLeagues } from "./routes/getLeagues";
 
 const steam = new SteamAuth({
   realm: "https://ovrpwrd-backend.herokuapp.com/", // Site name displayed to users on logon
@@ -14,6 +15,7 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
 app.use("/recentMatches", getRecentMatches);
+app.use("/currentLeagues", getLeagues);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);
