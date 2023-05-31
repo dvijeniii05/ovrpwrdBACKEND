@@ -1,8 +1,17 @@
 import express from "express";
 import SteamAuth from "node-steam-openid";
 import BigNumber from "bignumber.js";
+import mongoose from "mongoose";
+import passport from "passport";
+import session from "express-session";
+import cors from "cors";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
 import { router as getLeagues } from "./routes/getLeagues";
+import { router as getApiAuth } from "./routes/getGoogleAuth";
+import { config } from "dotenv";
+config();
+
+require("./strategies/google");
 
 const steam = new SteamAuth({
   realm: "https://ovrpwrd-backend.herokuapp.com/", // Site name displayed to users on logon
@@ -14,8 +23,22 @@ const app = express();
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
+app.use(cors());
+
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/recentMatches", getRecentMatches);
 app.use("/currentLeagues", getLeagues);
+app.use("/api/auth", getApiAuth);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);
@@ -45,6 +68,18 @@ app.get("/auth/steam/authenticate", async (req, res) => {
     console.error(error);
   }
 });
+
+const connectDB = async () => {
+  try {
+    const con = await mongoose.connect(process.env.MONGO_URI!);
+    console.log(con.connection.host);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+};
+
+connectDB();
 
 app.listen(process.env.PORT || 3000, () =>
   console.log("Listenning to PORT:3000")
