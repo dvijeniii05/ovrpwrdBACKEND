@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import mongoose from "mongoose";
 import passport from "passport";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import cors from "cors";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
 import { router as getLeagues } from "./routes/getLeagues";
@@ -28,6 +29,7 @@ app.use(cors());
 app.use(
   session({
     secret: "secret",
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI! }),
     resave: false,
     saveUninitialized: true,
   })
