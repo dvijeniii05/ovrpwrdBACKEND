@@ -10,12 +10,12 @@ const User_1 = __importDefault(require("../models/User"));
 exports.router = express_1.default.Router();
 exports.router.get("/google", passport_1.default.authenticate("google"), (req, res) => res.send(200));
 exports.router.get("/google/redirect", passport_1.default.authenticate("google", {
-    successRedirect: "http://localhost:3000/api/auth/success",
-    failureRedirect: "http://localhost:3000/api/auth/failure",
+    successRedirect: "https://ovrpwrd-backend.herokuapp.com/api/auth/success",
+    failureRedirect: "https://ovrpwrd-backend.herokuapp.com/api/auth/failure",
 }), (req, res) => res.send(200));
 exports.router.get("/success", (req, res) => {
     const userData = req.user;
-    console.log("req is there", userData);
+    // console.log("req is there", userData);
     User_1.default.findOne({ email: userData.emails[0].value }).then((user) => {
         if (user) {
             res.render("googleAuthFailed", {

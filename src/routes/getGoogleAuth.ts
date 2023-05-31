@@ -17,8 +17,8 @@ router.get("/google", passport.authenticate("google"), (req, res) =>
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    successRedirect: "http://localhost:3000/api/auth/success",
-    failureRedirect: "http://localhost:3000/api/auth/failure",
+    successRedirect: "https://ovrpwrd-backend.herokuapp.com/api/auth/success",
+    failureRedirect: "https://ovrpwrd-backend.herokuapp.com/api/auth/failure",
   }),
   (req, res) => res.send(200)
 );
