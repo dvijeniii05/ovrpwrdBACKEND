@@ -22,9 +22,7 @@
     "mongodb": "^5.5.0",
     "mongoose": "^7.2.0",
     "node-steam-openid": "^1.0.1",
-    "nodemon": "^2.0.20",
-    "passport": "^0.6.0",
-    "passport-google-oauth20": "^2.0.0"
+    "nodemon": "^2.0.20"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
@@ -32,8 +30,6 @@
     "@types/express-session": "^1.17.7",
     "@types/node": "^18.16.1",
     "@types/node-steam-openid": "^1.0.0",
-    "@types/passport": "^1.0.12",
-    "@types/passport-google-oauth20": "^2.0.11",
     "typescript": "^5.0.4"
   }
 }

@@ -16,15 +16,12 @@ const express_1 = __importDefault(require("express"));
 const node_steam_openid_1 = __importDefault(require("node-steam-openid"));
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const passport_1 = __importDefault(require("passport"));
-const express_session_1 = __importDefault(require("express-session"));
 const cors_1 = __importDefault(require("cors"));
 const getRecentMatches_1 = require("./routes/getRecentMatches");
 const getLeagues_1 = require("./routes/getLeagues");
-const getGoogleAuth_1 = require("./routes/getGoogleAuth");
+const userAuth_1 = require("./routes/userAuth");
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
-require("./strategies/google");
 const steam = new node_steam_openid_1.default({
     realm: "https://ovrpwrd-backend.herokuapp.com/",
     returnUrl: "https://ovrpwrd-backend.herokuapp.com/auth/steam/authenticate",
@@ -34,16 +31,9 @@ const app = (0, express_1.default)();
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use((0, cors_1.default)());
-app.use((0, express_session_1.default)({
-    secret: "secret",
-    resave: false,
-    saveUninitialized: true,
-}));
-app.use(passport_1.default.initialize());
-app.use(passport_1.default.session());
 app.use("/recentMatches", getRecentMatches_1.router);
 app.use("/currentLeagues", getLeagues_1.router);
-app.use("/api/auth", getGoogleAuth_1.router);
+app.use("/userAuth", userAuth_1.router);
 app.get("/steamid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("REQ", req.query.id);
     res.render("home");

@@ -2,17 +2,12 @@ import express from "express";
 import SteamAuth from "node-steam-openid";
 import BigNumber from "bignumber.js";
 import mongoose from "mongoose";
-import passport from "passport";
-import session from "express-session";
-import MongoStore from "connect-mongo";
 import cors from "cors";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
 import { router as getLeagues } from "./routes/getLeagues";
-import { router as getApiAuth } from "./routes/getGoogleAuth";
+import { router as userAuth } from "./routes/userAuth";
 import { config } from "dotenv";
 config();
-
-require("./strategies/google");
 
 const steam = new SteamAuth({
   realm: "https://ovrpwrd-backend.herokuapp.com/", // Site name displayed to users on logon
@@ -26,21 +21,9 @@ app.set("view engine", "ejs");
 
 app.use(cors());
 
-app.use(
-  session({
-    secret: "secret",
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI! }),
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.use("/recentMatches", getRecentMatches);
 app.use("/currentLeagues", getLeagues);
-app.use("/api/auth", getApiAuth);
+app.use("/userAuth", userAuth);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);
