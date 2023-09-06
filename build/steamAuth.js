@@ -12,6 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = require("dotenv");
+(0, dotenv_1.config)();
 const express_1 = __importDefault(require("express"));
 const node_steam_openid_1 = __importDefault(require("node-steam-openid"));
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
@@ -20,8 +22,6 @@ const cors_1 = __importDefault(require("cors"));
 const getRecentMatches_1 = require("./routes/getRecentMatches");
 const getLeagues_1 = require("./routes/getLeagues");
 const userAuth_1 = require("./routes/userAuth");
-const dotenv_1 = require("dotenv");
-(0, dotenv_1.config)();
 const steam = new node_steam_openid_1.default({
     realm: "https://ovrpwrd-backend.herokuapp.com/",
     returnUrl: "https://ovrpwrd-backend.herokuapp.com/auth/steam/authenticate",

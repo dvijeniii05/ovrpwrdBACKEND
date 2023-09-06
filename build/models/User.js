@@ -9,15 +9,32 @@ const UserSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
-    displayName: {
+    isFullyOnboarded: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    nickname: {
         type: String,
         required: false,
     },
-    firstName: {
+    fullName: {
         type: String,
         required: false,
     },
-    lastName: {
+    dob: {
+        type: String,
+        required: false,
+    },
+    country: {
+        type: String,
+        required: false,
+    },
+    gender: {
+        type: String,
+        required: false,
+    },
+    avatar: {
         type: String,
         required: false,
     },
@@ -25,8 +42,26 @@ const UserSchema = new mongoose_1.default.Schema({
         type: String,
         required: false,
     },
-    points: {
+    startingGameID: {
         type: String,
+        required: false,
+    },
+    startingGameTime: {
+        type: String,
+        required: false,
+    },
+    perks: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+    relics: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+    lastTenMatches: {
+        type: Array,
         required: false,
     },
     createdAt: {

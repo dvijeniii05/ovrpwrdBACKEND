@@ -1,8 +1,23 @@
 import express from "express";
 import axios from "axios";
 
+type MatchData = {
+  match_id: number;
+  player_slot: number;
+  radiant_win: boolean;
+  duration: number;
+  game_mode: number;
+  lobby_type: number;
+  hero_damage: number;
+  hero_healing: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+  start_time: number;
+};
+
 export const router = express.Router();
-const openDotaApi = "https://api.opendota.com/api";
+export const openDotaApi = "https://api.opendota.com/api";
 const stratzRest = "https://api.stratz.com/api/v1";
 const startzGraphql = "https://api.stratz.com/graphql";
 const startzBearerToken =
@@ -11,47 +26,37 @@ const startzBearerToken =
 router.get("/startingMatchData/:steamID32", async (req, res) => {
   const { steamID32 } = req.params;
 
-  // const recentMatches = await axios.get(`${openDotaApi}/players/${steamID32}`);
   const recentMatches = await axios.get(
-    `${stratzRest}/Player/${steamID32}/matches`,
-    {
-      headers: {
-        Authorization: `Bearer ${startzBearerToken}`,
-      },
-    }
+    `${openDotaApi}/players/${steamID32}/recentMatches`
+    // {
+    //   headers: {
+    //     Authorization: `Bearer ${startzBearerToken}`,
+    //   },
+    // }
   );
-  // console.log("RECENT_MATCHES", recentMatches);
 
-  const startingGameTime: number = recentMatches.data[0].startDateTime;
-  const startingGameID: number = recentMatches.data[0].id;
-  console.log(startingGameID, startingGameTime);
-  // All stats will be counted starting from the lastGameID and lastGameTime
+  const startingGameTime: number = recentMatches.data[0].start_time;
+  const startingGameID: number = recentMatches.data[0].match_id;
 
   res.status(200).send({ startingGameID, startingGameTime });
 });
 
-router.get("/getMatches/:steamID32/:startDateTime", async (req, res) => {
-  const { steamID32, startDateTime } = req.params;
+router.get("/getMatches/:steamID32/:startGameId", async (req, res) => {
+  const { steamID32, startGameId } = req.params;
 
-  const recentMatches = await axios.get(
-    `${stratzRest}/Player/${steamID32}/matches?isParsed=true&startDateTime=${startDateTime}`,
-    {
-      headers: { Authorization: `Bearer ${startzBearerToken}` },
-    }
+  const recentMatches: { data: MatchData[] } = await axios.get(
+    `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode`
+    // {
+    //   headers: { Authorization: `Bearer ${startzBearerToken}` },
+    // }
   );
-  // console.log(recentMatches.data[0]);
 
-  res.status(200).send(recentMatches.data);
-});
+  const fromThisGame = recentMatches.data.findIndex(
+    (match) => match.match_id === Number("7225084321")
+  );
 
-router.get("/getCustomMatch/:matchID", async (req, res) => {
-  const { matchID } = req.params;
+  const newGames = recentMatches.data.slice(0, fromThisGame);
 
-  const customMatchData = await axios.get(`${stratzRest}/match/${matchID}`, {
-    headers: { Authorization: `Bearer ${startzBearerToken}` },
-  });
-
-  const { startDateTime, id } = customMatchData.data;
-
-  res.status(200).send({ startDateTime, id });
+  console.log("INdex", newGames.length);
+  res.status(200).send(newGames);
 });

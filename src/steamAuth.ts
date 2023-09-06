@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config();
 import express from "express";
 import SteamAuth from "node-steam-openid";
 import BigNumber from "bignumber.js";
@@ -6,8 +8,6 @@ import cors from "cors";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
 import { router as getLeagues } from "./routes/getLeagues";
 import { router as userAuth } from "./routes/userAuth";
-import { config } from "dotenv";
-config();
 
 const steam = new SteamAuth({
   realm: "https://ovrpwrd-backend.herokuapp.com/", // Site name displayed to users on logon
