@@ -38,14 +38,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  startingGameID: {
-    type: String,
-    required: false,
-  },
-  startingGameTime: {
-    type: String,
-    required: false,
-  },
   perks: {
     type: Number,
     required: true,
@@ -56,9 +48,26 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  lastTenMatches: {
+  dota: {
+    type: {
+      latestGameId: {
+        type: Number,
+        required: false,
+      },
+      latestGameTime: {
+        type: String,
+        required: false,
+      },
+      significantMatches: {
+        type: Array,
+        required: true,
+      },
+    },
+    required: true,
+  },
+  purchases: {
     type: Array,
-    required: false,
+    required: true,
   },
   createdAt: {
     type: Date,

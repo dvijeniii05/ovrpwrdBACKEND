@@ -6,12 +6,23 @@ import BigNumber from "bignumber.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import { router as getRecentMatches } from "./routes/getRecentMatches";
-import { router as getLeagues } from "./routes/getLeagues";
+import { router as currentLeagues } from "./routes/currentLeagues";
 import { router as userAuth } from "./routes/userAuth";
+import { router as leaderboard } from "./routes/leaderboard";
+import { router as products } from "./routes/products";
+
+import { Telegraf } from "telegraf";
+
+export const devBaseUrl = `http://localhost:3000`;
+export const prodBaseUrl = `https://ovrpwrd-backend.herokuapp.com`;
+
+// THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
+// const bot = new Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
+// bot.telegram.sendMessage("-4080601885", "zbs");
 
 const steam = new SteamAuth({
-  realm: "https://ovrpwrd-backend.herokuapp.com/", // Site name displayed to users on logon
-  returnUrl: "https://ovrpwrd-backend.herokuapp.com/auth/steam/authenticate", // Your return route
+  realm: `${prodBaseUrl}`, // Site name displayed to users on logon
+  returnUrl: `${prodBaseUrl}/auth/steam/authenticate`, // Your return route
   apiKey: "D8B16689041256E8528ED5CFD72E1BFC", // Steam API key
 });
 
@@ -22,8 +33,10 @@ app.set("view engine", "ejs");
 app.use(cors());
 
 app.use("/recentMatches", getRecentMatches);
-app.use("/currentLeagues", getLeagues);
+app.use("/currentLeagues", currentLeagues);
+app.use("/products", products);
 app.use("/userAuth", userAuth);
+app.use("/leaderboard", leaderboard);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);
@@ -40,7 +53,7 @@ app.get("/auth/steam/authenticate", async (req, res) => {
   const to32converter = "76561197960265728";
   try {
     const user = await steam.authenticate(req);
-    console.log("USER", user);
+    console.log("RESPONSE_FROM_USER_AUTH", user);
 
     const steamID64 = encodeURIComponent(user.steamid);
     console.log("STEAM_ID", steamID64);
@@ -52,6 +65,11 @@ app.get("/auth/steam/authenticate", async (req, res) => {
   } catch (error) {
     console.error(error);
   }
+});
+
+app.get("/heroes/:heroId", async (req, res) => {
+  const { heroId } = req.params;
+  res.sendFile(`${__dirname}/heroes/${heroId}.png`);
 });
 
 const connectDB = async () => {

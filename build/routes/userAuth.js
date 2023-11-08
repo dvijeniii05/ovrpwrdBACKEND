@@ -24,7 +24,6 @@ exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("BODY_CHECK", req.body);
-    //NEED TO ADD JWT token for registration
     const { nickname, email, fullName, dob, gender, country } = req.body;
     User_1.default.findOne({ nickname }).then((user) => {
         if (user) {
@@ -41,9 +40,9 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
                 dob,
                 gender,
                 country,
+                dota: {},
             });
             newUser.save();
-            console.log("New user registered", email, fullName, nickname, dob, gender, country);
             const jwtToken = jsonwebtoken_1.default.sign({ userEmail: email }, process.env.JWT_SECRET);
             res.status(200).send({ token: jwtToken });
         }
@@ -74,60 +73,111 @@ exports.router.patch("/updateUserDetails", jsonParser, (req, res) => __awaiter(v
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         const email = decoded.userEmail;
         const filter = { email };
+        console.log("EMAIL_DECOED", email);
         const update = Object.assign({}, data);
-        const userDoc = yield User_1.default.findOneAndUpdate(filter, update);
-        if (userDoc) {
-            res.status(200).send({ message: "User details updated" });
-        }
-        else {
-            res.status(500).send({ message: "Error updating user details" });
-        }
+        User_1.default.findOneAndUpdate(filter, update).then((user) => {
+            if (user) {
+                res.status(200).send({ message: "User details updated" });
+            }
+            else {
+                res.status(404).send({ message: "Error updating user details" });
+            }
+        });
     }
     catch (err) {
         console.log("Incorrect JWT", err);
-        res.status(404).send({ message: "Error verifying JWT", error: err });
+        res.status(500).send({
+            message: "Error during JWT token validation process",
+            error: err,
+        });
     }
 }));
-exports.router.get("/getUserStats/:email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.params;
+exports.router.get("/getUserDetails", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers["authorization"];
+    const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+    const email = decoded.userEmail;
+    User_1.default.findOne({ email }, [
+        "email",
+        "nickname",
+        "fullName",
+        "dob",
+        "avatar",
+        "steamID32",
+        "dota",
+        "purchases",
+    ]).then((user) => {
+        if (user) {
+            res.status(200).send(user);
+        }
+        else {
+            res.status(404).send();
+        }
+    });
+}));
+exports.router.get("/linkSteam/:steamID32", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { steamID32 } = req.params;
+    const token = req.headers["authorization"];
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const email = decoded.userEmail;
+        const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/recentMatches`);
+        const latestGameTime = recentMatches.data[0].start_time;
+        const latestGameId = recentMatches.data[0].match_id;
+        const dota = { latestGameId, latestGameTime };
+        User_1.default.findOneAndUpdate({ email }, { steamID32, dota }).then((doc) => {
+            if (doc) {
+                res.status(200).send({
+                    message: "SteamID successfully linked",
+                    latestGameId: latestGameId,
+                });
+            }
+            else {
+                res.status(400).send({ message: "Error with SteamID linking" });
+            }
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            message: "Error during JWT token validation process",
+            error: err,
+        });
+    }
+}));
+exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers["authorization"];
+    const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+    const email = decoded.userEmail;
     const userData = yield User_1.default.findOne({ email });
     if (userData != null) {
-        const { startingGameID, steamID32 } = userData;
-        const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id`);
-        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === Number("7225084321"));
+        const { dota, steamID32 } = userData;
+        const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`);
+        // const fromThisGame = recentMatches.data.findIndex(
+        //   (match) => match.match_id === 7347336690
+        // );
+        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === dota.latestGameId);
         const newGames = recentMatches.data.slice(0, fromThisGame);
         if (newGames.length > 0) {
             //DO CALCULATION HERE
             const { parsedMatches, newPoints } = (0, calculationEngine_1.calculation)(newGames);
             userData.perks += newPoints;
-            userData.relics += newPoints * 0.001;
-            userData.lastTenMatches = parsedMatches;
+            userData.relics =
+                Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
+            dota.significantMatches = parsedMatches
+                .concat(dota.significantMatches)
+                .slice(0, 30);
+            dota.latestGameId = parsedMatches[0].matchId;
             yield userData.save();
         }
         const currentPerks = userData.perks;
         const currentRelics = userData.relics;
-        const lastTenMatches = userData.lastTenMatches;
-        res
-            .status(200)
-            .send({ currentPoints: { currentPerks, currentRelics }, lastTenMatches });
+        const significantMatches = dota.significantMatches;
+        res.status(200).send({
+            currentPoints: { currentPerks, currentRelics },
+            significantMatches,
+        });
     }
     else {
         // User Does Not exist logic
         res.status(500).send({ message: "User not dound" });
     }
-}));
-exports.router.get("/linkSteam/:email/:steamID32", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, steamID32 } = req.params;
-    const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/recentMatches`);
-    // console.log(recentMatches);
-    const startingGameTime = recentMatches.data[0].start_time;
-    const startingGameID = recentMatches.data[0].match_id;
-    User_1.default.findOneAndUpdate({ email }, { steamID32, startingGameID, startingGameTime }).then((doc) => {
-        if (doc) {
-            res.status(200).send({ message: "SteamID successfully linked" });
-        }
-        else {
-            res.status(400).send({ message: "Error with SteamID linking" });
-        }
-    });
 }));
