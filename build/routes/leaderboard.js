@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const User_1 = __importDefault(require("../models/User"));
 exports.router = express_1.default.Router();
 exports.router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("CHECK_HIT?");
     User_1.default.find({}, ["nickname", "perks", "avatar"])
         .sort({ perks: -1 })
         .then((allUsers) => {

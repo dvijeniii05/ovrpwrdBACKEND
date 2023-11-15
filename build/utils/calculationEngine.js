@@ -36,17 +36,18 @@ const calculation = (recentMatches) => {
             const isRadiant = (_a = singleMatch.player_slot <= 127) !== null && _a !== void 0 ? _a : false;
             const matchResultsPoints = isRadiant == singleMatch.radiant_win ? 100 : 40;
             const totalMatchPoints = damagePoints + matchResultsPoints + kdaPoints;
-            const finalTotalPoints = isSupport()
+            const roleDependingPoints = isSupport()
                 ? totalMatchPoints * 1.2
                 : totalMatchPoints;
-            newPoints += finalTotalPoints;
+            const finalMatchPoints = isTurbo
+                ? Math.round(0.5 * roleDependingPoints * 1e12) / 1e12
+                : Math.round(roleDependingPoints * 1e12) / 1e12;
+            newPoints += finalMatchPoints;
             parsedMatches.push({
                 isWin: isRadiant == singleMatch.radiant_win ? true : false,
                 hero: singleMatch.hero_id,
                 time: singleMatch.start_time,
-                points: isTurbo
-                    ? Math.round(0.5 * finalTotalPoints * 1e12) / 1e12
-                    : Math.round(finalTotalPoints * 1e12) / 1e12,
+                points: finalMatchPoints,
                 heroUrl: (0, heroImageUrlCreator_1.createHeroImageUrl)(singleMatch.hero_id),
                 kills: singleMatch.kills,
                 deaths: singleMatch.deaths,

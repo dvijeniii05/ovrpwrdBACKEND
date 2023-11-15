@@ -120,6 +120,7 @@ exports.router.get("/linkSteam/:steamID32", (req, res) => __awaiter(void 0, void
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         const email = decoded.userEmail;
+        console.log("LUL?", email, steamID32);
         const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/recentMatches`);
         const latestGameTime = recentMatches.data[0].start_time;
         const latestGameId = recentMatches.data[0].match_id;
@@ -151,10 +152,10 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
     if (userData != null) {
         const { dota, steamID32 } = userData;
         const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`);
+        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === 7435042659);
         // const fromThisGame = recentMatches.data.findIndex(
-        //   (match) => match.match_id === 7347336690
+        //   (match) => match.match_id === dota.latestGameId
         // );
-        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === dota.latestGameId);
         const newGames = recentMatches.data.slice(0, fromThisGame);
         if (newGames.length > 0) {
             //DO CALCULATION HERE

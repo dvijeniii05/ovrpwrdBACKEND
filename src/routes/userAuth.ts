@@ -149,7 +149,9 @@ router.get("/linkSteam/:steamID32", async (req, res) => {
   const token = req.headers["authorization"] as string;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+
     const email = (decoded as TokenInterface).userEmail;
+    console.log("LUL?", email, steamID32);
 
     const recentMatches = await axios.get(
       `${openDotaApi}/players/${steamID32}/recentMatches`
@@ -188,13 +190,13 @@ router.get("/getUserStats", async (req, res) => {
     const recentMatches: { data: MatchData[] } = await axios.get(
       `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
     );
-    // const fromThisGame = recentMatches.data.findIndex(
-    //   (match) => match.match_id === 7347336690
-    // );
-
     const fromThisGame = recentMatches.data.findIndex(
-      (match) => match.match_id === dota.latestGameId
+      (match) => match.match_id === 7435042659
     );
+
+    // const fromThisGame = recentMatches.data.findIndex(
+    //   (match) => match.match_id === dota.latestGameId
+    // );
 
     const newGames = recentMatches.data.slice(0, fromThisGame);
     if (newGames.length > 0) {
