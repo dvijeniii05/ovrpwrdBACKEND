@@ -190,13 +190,13 @@ router.get("/getUserStats", async (req, res) => {
     const recentMatches: { data: MatchData[] } = await axios.get(
       `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
     );
-    const fromThisGame = recentMatches.data.findIndex(
-      (match) => match.match_id === 7435042659
-    );
-
     // const fromThisGame = recentMatches.data.findIndex(
-    //   (match) => match.match_id === dota.latestGameId
+    //   (match) => match.match_id === 7435042659
     // );
+
+    const fromThisGame = recentMatches.data.findIndex(
+      (match) => match.match_id === dota.latestGameId
+    );
 
     const newGames = recentMatches.data.slice(0, fromThisGame);
     if (newGames.length > 0) {
