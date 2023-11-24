@@ -45,10 +45,6 @@ const ProductSchema = new mongoose_1.default.Schema({
         type: Number,
         required: true,
     },
-    isPriceInPerks: {
-        type: Boolean,
-        required: true,
-    },
     isDigital: {
         type: Boolean,
         required: true,

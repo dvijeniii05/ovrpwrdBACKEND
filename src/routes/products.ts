@@ -52,23 +52,24 @@ router.patch("/buyProduct", jsonParser, async (req, res) => {
           productBrand,
           productName,
           price,
-          isPriceInPerks,
           productLink,
         } = product;
         const userPromoCode = promoCodes[0];
         const updatedPromoCodes = promoCodes.filter(
-          (promoCode) => promoCode !== userPromoCode
+          (promoCode, index) => index !== promoCodes.indexOf(userPromoCode)
         );
+        // const updatedPromoCodes = promoCodes.splice(
+        //   promoCodes.indexOf(userPromoCode),
+        //   1
+        // );
         product.promoCodes = updatedPromoCodes;
         await product.save();
-        isPriceInPerks ? (user.perks -= price) : (user.relics -= price);
-
+        user.relics -= price;
         user.purchases.push({
           productThumbnailUrl,
           productBrand,
           productName,
           price,
-          isPriceInPerks,
           uniqueId,
           promoCode: userPromoCode,
           date: formattedDate,

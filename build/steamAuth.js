@@ -31,8 +31,8 @@ exports.prodBaseUrl = `https://ovrpwrd-backend.herokuapp.com`;
 // const bot = new Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
 // bot.telegram.sendMessage("-4080601885", "zbs");
 const steam = new node_steam_openid_1.default({
-    realm: `${exports.devBaseUrl}`,
-    returnUrl: `${exports.devBaseUrl}/auth/steam/authenticate`,
+    realm: `${exports.prodBaseUrl}`,
+    returnUrl: `${exports.prodBaseUrl}/auth/steam/authenticate`,
     apiKey: "D8B16689041256E8528ED5CFD72E1BFC", // Steam API key
 });
 const app = (0, express_1.default)();

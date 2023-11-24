@@ -52,18 +52,21 @@ exports.router.patch("/buyProduct", jsonParser, (req, res) => __awaiter(void 0, 
         const product = yield Product_1.default.findOne({ uniqueId });
         if (product != null && user != null) {
             if (product.promoCodes.length > 0) {
-                const { productThumbnailUrl, promoCodes, productBrand, productName, price, isPriceInPerks, productLink, } = product;
+                const { productThumbnailUrl, promoCodes, productBrand, productName, price, productLink, } = product;
                 const userPromoCode = promoCodes[0];
-                const updatedPromoCodes = promoCodes.filter((promoCode) => promoCode !== userPromoCode);
+                const updatedPromoCodes = promoCodes.filter((promoCode, index) => index !== promoCodes.indexOf(userPromoCode));
+                // const updatedPromoCodes = promoCodes.splice(
+                //   promoCodes.indexOf(userPromoCode),
+                //   1
+                // );
                 product.promoCodes = updatedPromoCodes;
                 yield product.save();
-                isPriceInPerks ? (user.perks -= price) : (user.relics -= price);
+                user.relics -= price;
                 user.purchases.push({
                     productThumbnailUrl,
                     productBrand,
                     productName,
                     price,
-                    isPriceInPerks,
                     uniqueId,
                     promoCode: userPromoCode,
                     date: formattedDate,
