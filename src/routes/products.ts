@@ -5,10 +5,15 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { TokenInterface } from "./userAuth";
 import User from "../models/User";
+import { Telegraf } from "telegraf";
+import { marketplaceChatId } from "../steamAuth";
 
 export const router = express.Router();
 
 const jsonParser = bodyParser.json();
+
+// THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
+const bot = new Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
 
 router.get("/getProducts", jsonParser, async (req, res) => {
   Product.find({}).then((allProducts) => {
@@ -76,6 +81,16 @@ router.patch("/buyProduct", jsonParser, async (req, res) => {
           productLink,
         });
         await user.save();
+        bot.telegram.sendMessage(
+          marketplaceChatId,
+          `Product purchased: 
+          name -> ${productName},
+          brand -> ${productBrand}, 
+          price -> ${price}, 
+          uniqueId -> ${uniqueId}, 
+          promoCode -> ${userPromoCode}
+          productImageUrl -> ${productThumbnailUrl}`
+        );
         res.status(200).send({ promoCode: userPromoCode });
       } else {
         res.status(402).send({ message: "This product is out of stock" });

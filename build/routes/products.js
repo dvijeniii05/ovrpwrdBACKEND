@@ -19,8 +19,12 @@ const Product_1 = __importDefault(require("../models/Product"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const uuid_1 = require("uuid");
 const User_1 = __importDefault(require("../models/User"));
+const telegraf_1 = require("telegraf");
+const steamAuth_1 = require("../steamAuth");
 exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
+// THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
+const bot = new telegraf_1.Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
 exports.router.get("/getProducts", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     Product_1.default.find({}).then((allProducts) => {
         res.status(200).send(allProducts);
@@ -73,6 +77,13 @@ exports.router.patch("/buyProduct", jsonParser, (req, res) => __awaiter(void 0, 
                     productLink,
                 });
                 yield user.save();
+                bot.telegram.sendMessage(steamAuth_1.marketplaceChatId, `Product purchased: 
+          name -> ${productName},
+          brand -> ${productBrand}, 
+          price -> ${price}, 
+          uniqueId -> ${uniqueId}, 
+          promoCode -> ${userPromoCode}
+          productImageUrl -> ${productThumbnailUrl}`);
                 res.status(200).send({ promoCode: userPromoCode });
             }
             else {

@@ -10,11 +10,15 @@ import { router as currentLeagues } from "./routes/currentLeagues";
 import { router as userAuth } from "./routes/userAuth";
 import { router as leaderboard } from "./routes/leaderboard";
 import { router as products } from "./routes/products";
+import { router as support } from "./routes/support";
 
 import { Telegraf } from "telegraf";
 
 export const devBaseUrl = `http://localhost:3000`;
 export const prodBaseUrl = `https://ovrpwrd-backend.herokuapp.com`;
+
+export const marketplaceChatId = "-4080601885";
+export const supportChatId = "-4032001652";
 
 // THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
 // const bot = new Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
@@ -37,6 +41,7 @@ app.use("/currentLeagues", currentLeagues);
 app.use("/products", products);
 app.use("/userAuth", userAuth);
 app.use("/leaderboard", leaderboard);
+app.use("/support", support);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);

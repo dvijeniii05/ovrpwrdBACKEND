@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prodBaseUrl = exports.devBaseUrl = void 0;
+exports.supportChatId = exports.marketplaceChatId = exports.prodBaseUrl = exports.devBaseUrl = void 0;
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
 const express_1 = __importDefault(require("express"));
@@ -25,8 +25,11 @@ const currentLeagues_1 = require("./routes/currentLeagues");
 const userAuth_1 = require("./routes/userAuth");
 const leaderboard_1 = require("./routes/leaderboard");
 const products_1 = require("./routes/products");
+const support_1 = require("./routes/support");
 exports.devBaseUrl = `http://localhost:3000`;
 exports.prodBaseUrl = `https://ovrpwrd-backend.herokuapp.com`;
+exports.marketplaceChatId = "-4080601885";
+exports.supportChatId = "-4032001652";
 // THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
 // const bot = new Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
 // bot.telegram.sendMessage("-4080601885", "zbs");
@@ -44,6 +47,7 @@ app.use("/currentLeagues", currentLeagues_1.router);
 app.use("/products", products_1.router);
 app.use("/userAuth", userAuth_1.router);
 app.use("/leaderboard", leaderboard_1.router);
+app.use("/support", support_1.router);
 app.get("/steamid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("REQ", req.query.id);
     res.render("home");
