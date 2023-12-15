@@ -15,7 +15,7 @@ import { router as support } from "./routes/support";
 import { Telegraf } from "telegraf";
 
 export const devBaseUrl = `http://localhost:3000`;
-export const prodBaseUrl = `https://ovrpwrd-backend.herokuapp.com`;
+export const prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
 
 export const marketplaceChatId = "-4080601885";
 export const supportChatId = "-4032001652";
