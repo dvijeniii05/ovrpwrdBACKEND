@@ -151,6 +151,7 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
     const userData = yield User_1.default.findOne({ email });
     if (userData != null) {
         const { dota, steamID32 } = userData;
+        console.log("CHeck_In_stats", steamID32, email);
         const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`);
         // const fromThisGame = recentMatches.data.findIndex(
         //   (match) => match.match_id === 7435042659
