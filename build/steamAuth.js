@@ -27,12 +27,9 @@ const leaderboard_1 = require("./routes/leaderboard");
 const products_1 = require("./routes/products");
 const support_1 = require("./routes/support");
 exports.devBaseUrl = `http://localhost:3000`;
-exports.prodBaseUrl = `https://ovrpwrd-backend.herokuapp.com`;
+exports.prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
 exports.marketplaceChatId = "-4080601885";
 exports.supportChatId = "-4032001652";
-// THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
-// const bot = new Telegraf("6942613564:AAHw2Ck2UUnPi7WZDZgy8IrqNLJWaIIXTfE");
-// bot.telegram.sendMessage("-4080601885", "zbs");
 const steam = new node_steam_openid_1.default({
     realm: `${exports.prodBaseUrl}`,
     returnUrl: `${exports.prodBaseUrl}/auth/steam/authenticate`,
