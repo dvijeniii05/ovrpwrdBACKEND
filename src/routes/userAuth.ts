@@ -190,7 +190,7 @@ router.get("/getUserStats", async (req, res) => {
     console.log("CHeck_In_stats", steamID32, email);
     console.log("IP_CHECK", req.headers["x-forwarded-for"]);
     const recentMatches: { data: MatchData[] } = await axios.get(
-      `${openDotaApi}/players/${steamID32}/matches?api_key=f38ae540-43eb-4422-ad90-5df913c8be6c&significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
+      `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
     );
     // const fromThisGame = recentMatches.data.findIndex(
     //   (match) => match.match_id === 7435042659
