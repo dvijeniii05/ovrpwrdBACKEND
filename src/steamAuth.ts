@@ -84,5 +84,5 @@ const connectDB = async () => {
 connectDB();
 
 app.listen(process.env.PORT || 3000, () =>
-  console.log("Listenning to PORT:3000")
+  console.log("Listenning to PORT:3000", process.env.PORT)
 );
