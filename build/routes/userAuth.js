@@ -41,6 +41,7 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
                 gender,
                 country,
                 dota: {},
+                rewards: {},
             });
             newUser.save();
             const jwtToken = jsonwebtoken_1.default.sign({ userEmail: email }, process.env.JWT_SECRET);
@@ -105,7 +106,21 @@ exports.router.get("/getUserDetails", (req, res) => __awaiter(void 0, void 0, vo
         "steamID32",
         "dota",
         "purchases",
+        "rewards",
     ]).then((user) => {
+        if (user) {
+            res.status(200).send(user);
+        }
+        else {
+            res.status(404).send();
+        }
+    });
+}));
+exports.router.get("/getUserCurrency", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers["authorization"];
+    const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+    const email = decoded.userEmail;
+    User_1.default.findOne({ email }, ["perks", "relics"]).then((user) => {
         if (user) {
             res.status(200).send(user);
         }

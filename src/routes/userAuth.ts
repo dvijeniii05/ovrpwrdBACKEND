@@ -70,6 +70,7 @@ router.post("/registerUser", jsonParser, async (req, res) => {
         gender,
         country,
         dota: {},
+        rewards: {},
       });
       newUser.save();
       const jwtToken = jwt.sign({ userEmail: email }, process.env.JWT_SECRET!);
@@ -135,7 +136,22 @@ router.get("/getUserDetails", async (req, res) => {
     "steamID32",
     "dota",
     "purchases",
+    "rewards",
   ]).then((user) => {
+    if (user) {
+      res.status(200).send(user);
+    } else {
+      res.status(404).send();
+    }
+  });
+});
+
+router.get("/getUserCurrency", async (req, res) => {
+  const token = req.headers["authorization"] as string;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+  const email = (decoded as TokenInterface).userEmail;
+
+  User.findOne({ email }, ["perks", "relics"]).then((user) => {
     if (user) {
       res.status(200).send(user);
     } else {

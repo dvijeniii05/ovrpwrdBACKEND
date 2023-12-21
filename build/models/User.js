@@ -73,6 +73,26 @@ const UserSchema = new mongoose_1.default.Schema({
         type: Array,
         required: true,
     },
+    rewards: {
+        type: {
+            leftGiftClaimedDate: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+            midGiftClaimedDate: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+            rightGiftClaimedDate: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+        },
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
