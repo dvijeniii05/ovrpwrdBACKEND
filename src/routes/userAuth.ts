@@ -71,6 +71,7 @@ router.post("/registerUser", jsonParser, async (req, res) => {
         country,
         dota: {},
         rewards: {},
+        premium: {},
       });
       newUser.save();
       const jwtToken = jwt.sign({ userEmail: email }, process.env.JWT_SECRET!);
@@ -212,6 +213,11 @@ router.get("/getUserStats", async (req, res) => {
     //   (match) => match.match_id === 7435042659
     // );
 
+    const isPremiumActive = userData.premium.isPremiumActive;
+    const premiumGamesLeft = userData.premium.premiumGamesLeft;
+
+    const hasBonusMatch = isPremiumActive && premiumGamesLeft > 0;
+
     const fromThisGame = recentMatches.data.findIndex(
       (match) => match.match_id === dota.latestGameId
     );
@@ -219,7 +225,7 @@ router.get("/getUserStats", async (req, res) => {
     const newGames = recentMatches.data.slice(0, fromThisGame);
     if (newGames.length > 0) {
       //DO CALCULATION HERE
-      const { parsedMatches, newPoints } = calculation(newGames);
+      const { parsedMatches, newPoints } = calculation(newGames, hasBonusMatch);
       userData.perks += newPoints;
       userData.relics =
         Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
@@ -227,7 +233,16 @@ router.get("/getUserStats", async (req, res) => {
         .concat(dota.significantMatches)
         .slice(0, 30);
       dota.latestGameId = parsedMatches[0].matchId;
-
+      if (isPremiumActive) {
+        if (premiumGamesLeft > 1) {
+          userData.premium.premiumGamesLeft -= 1;
+          userData.premium.isPremiumActive = false;
+        } else {
+          userData.premium.premiumGamesLeft -= 1;
+          userData.premium.hasPremium = false;
+          userData.premium.isPremiumActive = false;
+        }
+      }
       await userData.save();
     }
     const currentPerks = userData.perks;

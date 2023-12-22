@@ -52,6 +52,26 @@ const UserSchema = new mongoose_1.default.Schema({
         required: true,
         default: 0,
     },
+    premium: {
+        type: {
+            hasPremium: {
+                type: Boolean,
+                required: true,
+                default: false,
+            },
+            isPremiumActive: {
+                type: Boolean,
+                required: true,
+                default: false,
+            },
+            premiumGamesLeft: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+        },
+        required: true,
+    },
     dota: {
         type: {
             latestGameId: {

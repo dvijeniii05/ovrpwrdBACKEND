@@ -10,6 +10,7 @@
   "author": "dvijeniii05",
   "license": "ISC",
   "dependencies": {
+    "@types/flat": "^5.0.5",
     "axios": "^1.4.0",
     "bignumber.js": "^9.1.1",
     "body-parser": "^1.20.2",
@@ -20,6 +21,7 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "flat": "5.0.2",
     "jsonwebtoken": "^9.0.1",
     "mongodb": "^5.5.0",
     "mongoose": "^7.2.0",

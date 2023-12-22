@@ -12,6 +12,7 @@ import { router as leaderboard } from "./routes/leaderboard";
 import { router as products } from "./routes/products";
 import { router as support } from "./routes/support";
 import { router as claimReward } from "./routes/claimReward";
+import { router as premium } from "./routes/premium";
 
 export const devBaseUrl = `http://localhost:3000`;
 export const prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
@@ -38,6 +39,7 @@ app.use("/userAuth", userAuth);
 app.use("/leaderboard", leaderboard);
 app.use("/support", support);
 app.use("/claimReward", claimReward);
+app.use("/premium", premium);
 
 app.get("/steamid", async (req, res) => {
   console.log("REQ", req.query.id);

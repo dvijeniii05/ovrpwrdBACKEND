@@ -27,6 +27,7 @@ const leaderboard_1 = require("./routes/leaderboard");
 const products_1 = require("./routes/products");
 const support_1 = require("./routes/support");
 const claimReward_1 = require("./routes/claimReward");
+const premium_1 = require("./routes/premium");
 exports.devBaseUrl = `http://localhost:3000`;
 exports.prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
 exports.marketplaceChatId = "-4080601885";
@@ -47,6 +48,7 @@ app.use("/userAuth", userAuth_1.router);
 app.use("/leaderboard", leaderboard_1.router);
 app.use("/support", support_1.router);
 app.use("/claimReward", claimReward_1.router);
+app.use("/premium", premium_1.router);
 app.get("/steamid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("REQ", req.query.id);
     res.render("home");

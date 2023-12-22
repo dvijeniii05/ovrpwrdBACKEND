@@ -2,11 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculation = void 0;
 const heroImageUrlCreator_1 = require("./heroImageUrlCreator");
-const calculation = (recentMatches) => {
+const calculation = (recentMatches, hasBonusMatch) => {
     let newPoints = 0;
     let parsedMatches = [];
-    recentMatches.map((singleMatch) => {
+    recentMatches.map((singleMatch, index) => {
         var _a;
+        const isBonusMatch = hasBonusMatch && index === recentMatches.length - 1;
+        console.log("BONUS_CHECK", isBonusMatch, index, singleMatch.match_id);
+        const bonusMultiplier = isBonusMatch ? 2 : 1;
         const isTurboOrRanking = singleMatch.game_mode == 22 || singleMatch.game_mode == 23;
         const isTurbo = singleMatch.game_mode == 23;
         //only calculate 22 or 23 game mode matches AND half the points for 23 game mode (turbo)
@@ -40,8 +43,8 @@ const calculation = (recentMatches) => {
                 ? totalMatchPoints * 1.2
                 : totalMatchPoints;
             const finalMatchPoints = isTurbo
-                ? Math.round(0.5 * roleDependingPoints * 1e12) / 1e12
-                : Math.round(roleDependingPoints * 1e12) / 1e12;
+                ? Math.round(bonusMultiplier * 0.5 * roleDependingPoints * 1e12) / 1e12
+                : Math.round(bonusMultiplier * roleDependingPoints * 1e12) / 1e12;
             newPoints += finalMatchPoints;
             parsedMatches.push({
                 isWin: isRadiant == singleMatch.radiant_win ? true : false,

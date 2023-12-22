@@ -42,6 +42,7 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
                 country,
                 dota: {},
                 rewards: {},
+                premium: {},
             });
             newUser.save();
             const jwtToken = jsonwebtoken_1.default.sign({ userEmail: email }, process.env.JWT_SECRET);
@@ -172,11 +173,14 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
         // const fromThisGame = recentMatches.data.findIndex(
         //   (match) => match.match_id === 7435042659
         // );
-        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === dota.latestGameId);
+        const isPremiumActive = userData.premium.isPremiumActive;
+        const premiumGamesLeft = userData.premium.premiumGamesLeft;
+        const hasBonusMatch = isPremiumActive && premiumGamesLeft > 0;
+        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === 7495051908);
         const newGames = recentMatches.data.slice(0, fromThisGame);
         if (newGames.length > 0) {
             //DO CALCULATION HERE
-            const { parsedMatches, newPoints } = (0, calculationEngine_1.calculation)(newGames);
+            const { parsedMatches, newPoints } = (0, calculationEngine_1.calculation)(newGames, hasBonusMatch);
             userData.perks += newPoints;
             userData.relics =
                 Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
@@ -184,6 +188,17 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
                 .concat(dota.significantMatches)
                 .slice(0, 30);
             dota.latestGameId = parsedMatches[0].matchId;
+            if (isPremiumActive) {
+                if (premiumGamesLeft > 1) {
+                    userData.premium.premiumGamesLeft -= 1;
+                    userData.premium.isPremiumActive = false;
+                }
+                else {
+                    userData.premium.premiumGamesLeft -= 1;
+                    userData.premium.hasPremium = false;
+                    userData.premium.isPremiumActive = false;
+                }
+            }
             yield userData.save();
         }
         const currentPerks = userData.perks;
