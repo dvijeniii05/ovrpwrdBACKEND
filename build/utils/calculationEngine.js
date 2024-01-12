@@ -2,18 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculation = void 0;
 const heroImageUrlCreator_1 = require("./heroImageUrlCreator");
-const calculation = (recentMatches, hasBonusMatch) => {
+const calculation = (recentMatches, hasBonusMatch, leagueStartDate, leagueEndDate) => {
     let newPoints = 0;
     let parsedMatches = [];
     recentMatches.map((singleMatch, index) => {
         var _a;
+        const isWithinLeaguePeriod = singleMatch.start_time > leagueStartDate &&
+            singleMatch.start_time < leagueEndDate;
         const isBonusMatch = hasBonusMatch && index === recentMatches.length - 1;
-        console.log("BONUS_CHECK", isBonusMatch, index, singleMatch.match_id);
         const bonusMultiplier = isBonusMatch ? 2 : 1;
         const isTurboOrRanking = singleMatch.game_mode == 22 || singleMatch.game_mode == 23;
         const isTurbo = singleMatch.game_mode == 23;
         //only calculate 22 or 23 game mode matches AND half the points for 23 game mode (turbo)
-        if (isTurboOrRanking) {
+        if (isTurboOrRanking && isWithinLeaguePeriod) {
             const isSupport = () => {
                 if (singleMatch.duration / 60 < 25) {
                     const lastHitsCheck = singleMatch.last_hits < (isTurbo ? 60 : 40);
@@ -57,6 +58,7 @@ const calculation = (recentMatches, hasBonusMatch) => {
                 assists: singleMatch.assists,
                 matchId: singleMatch.match_id,
                 gameMode: isTurbo ? "turbo" : "ranking",
+                isBonusMatch: isBonusMatch,
             });
         }
     });

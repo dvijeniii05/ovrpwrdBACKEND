@@ -20,6 +20,8 @@ const axios_1 = __importDefault(require("axios"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const getRecentMatches_1 = require("./getRecentMatches");
 const calculationEngine_1 = require("../utils/calculationEngine");
+const dummyRecentMatches_1 = require("../constants/dummyRecentMatches");
+const League_1 = __importDefault(require("../models/League"));
 exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -165,41 +167,47 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
     const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
     const email = decoded.userEmail;
     const userData = yield User_1.default.findOne({ email });
-    if (userData != null) {
+    const league = yield League_1.default.findOne({});
+    if (userData != null && league != null) {
         const { dota, steamID32 } = userData;
-        console.log("CHeck_In_stats", steamID32, email);
-        console.log("IP_CHECK", req.headers["x-forwarded-for"]);
-        const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`);
-        // const fromThisGame = recentMatches.data.findIndex(
-        //   (match) => match.match_id === 7435042659
+        const { startDate, endDate } = league;
+        // const league = League.find({}).then((allLeagues) => allLeagues[0]);
+        // const recentMatches: { data: MatchData[] } = await axios.get(
+        //   `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
         // );
+        const recentMatches = dummyRecentMatches_1.dummyRecentMatches;
         const isPremiumActive = userData.premium.isPremiumActive;
         const premiumGamesLeft = userData.premium.premiumGamesLeft;
         const hasBonusMatch = isPremiumActive && premiumGamesLeft > 0;
-        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === 7495051908);
+        // const fromThisGame = recentMatches.data.findIndex(
+        //   (match) => match.match_id === dota.latestGameId
+        // );
+        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === 7523323314);
         const newGames = recentMatches.data.slice(0, fromThisGame);
         if (newGames.length > 0) {
             //DO CALCULATION HERE
-            const { parsedMatches, newPoints } = (0, calculationEngine_1.calculation)(newGames, hasBonusMatch);
-            userData.perks += newPoints;
-            userData.relics =
-                Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
-            dota.significantMatches = parsedMatches
-                .concat(dota.significantMatches)
-                .slice(0, 30);
-            dota.latestGameId = parsedMatches[0].matchId;
-            if (isPremiumActive) {
-                if (premiumGamesLeft > 1) {
-                    userData.premium.premiumGamesLeft -= 1;
-                    userData.premium.isPremiumActive = false;
+            const { parsedMatches, newPoints } = (0, calculationEngine_1.calculation)(newGames, hasBonusMatch, startDate, endDate);
+            if (parsedMatches.length > 0) {
+                userData.perks += newPoints;
+                userData.relics =
+                    Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
+                dota.significantMatches = parsedMatches
+                    .concat(dota.significantMatches)
+                    .slice(0, 30);
+                dota.latestGameId = parsedMatches[0].matchId;
+                if (isPremiumActive) {
+                    if (premiumGamesLeft > 1) {
+                        userData.premium.premiumGamesLeft -= 1;
+                        userData.premium.isPremiumActive = false;
+                    }
+                    else {
+                        userData.premium.premiumGamesLeft -= 1;
+                        userData.premium.hasPremium = false;
+                        userData.premium.isPremiumActive = false;
+                    }
                 }
-                else {
-                    userData.premium.premiumGamesLeft -= 1;
-                    userData.premium.hasPremium = false;
-                    userData.premium.isPremiumActive = false;
-                }
+                yield userData.save();
             }
-            yield userData.save();
         }
         const currentPerks = userData.perks;
         const currentRelics = userData.relics;

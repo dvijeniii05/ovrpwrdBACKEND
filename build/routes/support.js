@@ -17,6 +17,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const express_1 = __importDefault(require("express"));
 const telegraf_1 = require("telegraf");
 const steamAuth_1 = require("../steamAuth");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 // THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
@@ -30,6 +31,20 @@ exports.router.post("/reportNickname", jsonParser, (req, res) => __awaiter(void 
         res.status(200).send();
     }
     catch (_a) {
+        res.status(500).send();
+    }
+}));
+exports.router.get("/deleteAccount", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers["authorization"];
+    console.log("TOKEN", token);
+    const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+    const email = decoded.userEmail;
+    try {
+        bot.telegram.sendMessage(steamAuth_1.accountDeletionChatId, `Delete Account: ${email}`);
+        console.log("Account to Delete", email);
+        res.status(200).send();
+    }
+    catch (_b) {
         res.status(500).send();
     }
 }));

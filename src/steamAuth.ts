@@ -19,6 +19,7 @@ export const prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
 
 export const marketplaceChatId = "-4080601885";
 export const supportChatId = "-4032001652";
+export const accountDeletionChatId = "-4018406128";
 
 const steam = new SteamAuth({
   realm: `${prodBaseUrl}`, // Site name displayed to users on logon

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.supportChatId = exports.marketplaceChatId = exports.prodBaseUrl = exports.devBaseUrl = void 0;
+exports.accountDeletionChatId = exports.supportChatId = exports.marketplaceChatId = exports.prodBaseUrl = exports.devBaseUrl = void 0;
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
 const express_1 = __importDefault(require("express"));
@@ -32,6 +32,7 @@ exports.devBaseUrl = `http://localhost:3000`;
 exports.prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
 exports.marketplaceChatId = "-4080601885";
 exports.supportChatId = "-4032001652";
+exports.accountDeletionChatId = "-4018406128";
 const steam = new node_steam_openid_1.default({
     realm: `${exports.prodBaseUrl}`,
     returnUrl: `${exports.prodBaseUrl}/auth/steam/authenticate`,

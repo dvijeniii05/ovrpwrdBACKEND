@@ -17,6 +17,10 @@ const LeagueSchema = new mongoose_1.default.Schema({
         type: Number,
         required: true,
     },
+    startDate: {
+        type: Number,
+        required: true,
+    },
     pointsMin: {
         type: Number,
         required: true,

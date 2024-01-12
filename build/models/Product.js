@@ -45,8 +45,8 @@ const ProductSchema = new mongoose_1.default.Schema({
         type: Number,
         required: true,
     },
-    isDigital: {
-        type: Boolean,
+    type: {
+        type: String,
         required: true,
     },
 });

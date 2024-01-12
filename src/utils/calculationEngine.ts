@@ -16,22 +16,29 @@ export interface ParsedMatch {
   assists: number;
   matchId: number;
   gameMode: string;
+  isBonusMatch: boolean;
 }
 
 export const calculation = (
   recentMatches: MatchData[],
-  hasBonusMatch: boolean
+  hasBonusMatch: boolean,
+  leagueStartDate: number,
+  leagueEndDate: number
 ) => {
   let newPoints: number = 0;
   let parsedMatches: ParsedMatch[] = [];
   recentMatches.map((singleMatch, index) => {
+    const isWithinLeaguePeriod =
+      singleMatch.start_time > leagueStartDate &&
+      singleMatch.start_time < leagueEndDate;
+
     const isBonusMatch = hasBonusMatch && index === recentMatches.length - 1;
     const bonusMultiplier = isBonusMatch ? 2 : 1;
     const isTurboOrRanking =
       singleMatch.game_mode == 22 || singleMatch.game_mode == 23;
     const isTurbo = singleMatch.game_mode == 23;
     //only calculate 22 or 23 game mode matches AND half the points for 23 game mode (turbo)
-    if (isTurboOrRanking) {
+    if (isTurboOrRanking && isWithinLeaguePeriod) {
       const isSupport = () => {
         if (singleMatch.duration / 60 < 25) {
           const lastHitsCheck = singleMatch.last_hits < (isTurbo ? 60 : 40);
@@ -75,6 +82,7 @@ export const calculation = (
         assists: singleMatch.assists,
         matchId: singleMatch.match_id,
         gameMode: isTurbo ? "turbo" : "ranking",
+        isBonusMatch: isBonusMatch,
       });
     }
   });

@@ -5,6 +5,8 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 import { openDotaApi } from "./getRecentMatches";
 import { calculation } from "../utils/calculationEngine";
+import { dummyRecentMatches } from "../constants/dummyRecentMatches";
+import League from "../models/League";
 
 export const router = express.Router();
 interface UserDataProps {
@@ -20,7 +22,6 @@ export interface MatchData {
   duration: number;
   hero_id: number;
   game_mode: number;
-  lobby_type: number;
   hero_damage: number;
   hero_healing: number;
   kills: number;
@@ -202,16 +203,17 @@ router.get("/getUserStats", async (req, res) => {
   const email = (decoded as TokenInterface).userEmail;
 
   const userData = await User.findOne({ email });
-  if (userData != null) {
+  const league = await League.findOne({});
+  if (userData != null && league != null) {
     const { dota, steamID32 } = userData;
-    console.log("CHeck_In_stats", steamID32, email);
-    console.log("IP_CHECK", req.headers["x-forwarded-for"]);
+
+    const { startDate, endDate } = league;
+
     const recentMatches: { data: MatchData[] } = await axios.get(
       `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
     );
-    // const fromThisGame = recentMatches.data.findIndex(
-    //   (match) => match.match_id === 7435042659
-    // );
+
+    // const recentMatches: { data: MatchData[] } = dummyRecentMatches;
 
     const isPremiumActive = userData.premium.isPremiumActive;
     const premiumGamesLeft = userData.premium.premiumGamesLeft;
@@ -222,28 +224,40 @@ router.get("/getUserStats", async (req, res) => {
       (match) => match.match_id === dota.latestGameId
     );
 
+    // const fromThisGame = recentMatches.data.findIndex(
+    //   (match) => match.match_id === 7523323314
+    // );
+
     const newGames = recentMatches.data.slice(0, fromThisGame);
     if (newGames.length > 0) {
       //DO CALCULATION HERE
-      const { parsedMatches, newPoints } = calculation(newGames, hasBonusMatch);
-      userData.perks += newPoints;
-      userData.relics =
-        Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
-      dota.significantMatches = parsedMatches
-        .concat(dota.significantMatches)
-        .slice(0, 30);
-      dota.latestGameId = parsedMatches[0].matchId;
-      if (isPremiumActive) {
-        if (premiumGamesLeft > 1) {
-          userData.premium.premiumGamesLeft -= 1;
-          userData.premium.isPremiumActive = false;
-        } else {
-          userData.premium.premiumGamesLeft -= 1;
-          userData.premium.hasPremium = false;
-          userData.premium.isPremiumActive = false;
+      const { parsedMatches, newPoints } = calculation(
+        newGames,
+        hasBonusMatch,
+        startDate,
+        endDate
+      );
+
+      if (parsedMatches.length > 0) {
+        userData.perks += newPoints;
+        userData.relics =
+          Math.round((userData.relics + newPoints * 0.001) * 1e12) / 1e12; //to fix flaoting point rounding error on binary level
+        dota.significantMatches = parsedMatches
+          .concat(dota.significantMatches)
+          .slice(0, 30);
+        dota.latestGameId = parsedMatches[0].matchId;
+        if (isPremiumActive) {
+          if (premiumGamesLeft > 1) {
+            userData.premium.premiumGamesLeft -= 1;
+            userData.premium.isPremiumActive = false;
+          } else {
+            userData.premium.premiumGamesLeft -= 1;
+            userData.premium.hasPremium = false;
+            userData.premium.isPremiumActive = false;
+          }
         }
+        await userData.save();
       }
-      await userData.save();
     }
     const currentPerks = userData.perks;
     const currentRelics = userData.relics;
