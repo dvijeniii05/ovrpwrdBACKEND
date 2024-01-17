@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TokenInterface } from "./userAuth";
 import User from "../models/User";
 import { Telegraf } from "telegraf";
-import { marketplaceChatId } from "../steamAuth";
+import { marketplaceChatId } from "../App";
 
 export const router = express.Router();
 
@@ -24,12 +24,26 @@ router.get("/getProducts", jsonParser, async (req, res) => {
 router.post("/addNewProducts", jsonParser, async (req, res) => {
   const productSecret = req.headers["authorization"] as string;
   if (productSecret === process.env.PRODUCT_SECRET) {
-    const receivedProducts: [] = req.body;
-    receivedProducts.map((singleProduct: any) => {
-      const newProduct = new Product({ uniqueId: uuidv4(), ...singleProduct });
-      newProduct.save();
-    });
-    res.status(200).send("All products added");
+    const receivedProducts: any[] = req.body;
+    let error;
+
+    for (let i = 0; i < receivedProducts.length; i++) {
+      const newProduct = new Product({
+        uniqueId: uuidv4(),
+        ...receivedProducts[i],
+      });
+      error = newProduct.validateSync();
+      if (error) {
+        break;
+      } else {
+        await newProduct.save();
+      }
+    }
+    if (error) {
+      res.status(500).send(error.message);
+    } else {
+      res.status(200).send("All products added");
+    }
   }
 });
 

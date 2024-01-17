@@ -138,22 +138,40 @@ exports.router.get("/linkSteam/:steamID32", (req, res) => __awaiter(void 0, void
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         const email = decoded.userEmail;
-        console.log("LUL?", email, steamID32);
-        const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/recentMatches`);
-        const latestGameTime = recentMatches.data[0].start_time;
-        const latestGameId = recentMatches.data[0].match_id;
-        const dota = { latestGameId, latestGameTime };
-        User_1.default.findOneAndUpdate({ email }, { steamID32, dota }).then((doc) => {
-            if (doc) {
-                res.status(200).send({
-                    message: "SteamID successfully linked",
-                    latestGameId: latestGameId,
+        const isDuplicateSteamID = yield User_1.default.findOne({ steamID32 });
+        if (isDuplicateSteamID) {
+            res.status(409).send({
+                message: `Your steamID is already in use.`,
+            });
+        }
+        else {
+            // Introduce logic to check publich match history. If disabled then return 401 and ask to enable it.
+            yield axios_1.default.post(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/refresh`);
+            const updatedUserInfo = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}`);
+            const isPublicMatchHistory = !updatedUserInfo.data.profile.fh_unavailable;
+            if (isPublicMatchHistory) {
+                const recentMatches = yield axios_1.default.get(`${getRecentMatches_1.openDotaApi}/players/${steamID32}/recentMatches`);
+                const latestGameTime = recentMatches.data[0].start_time;
+                const latestGameId = recentMatches.data[0].match_id;
+                const dota = { latestGameId, latestGameTime };
+                User_1.default.findOneAndUpdate({ email }, { steamID32, dota }).then((doc) => {
+                    if (doc) {
+                        res.status(200).send({
+                            message: "SteamID successfully linked",
+                            latestGameId: latestGameId,
+                        });
+                    }
+                    else {
+                        res.status(400).send({ message: "Error with SteamID linking" });
+                    }
                 });
             }
             else {
-                res.status(400).send({ message: "Error with SteamID linking" });
+                res.status(406).send({
+                    message: `Match history is not public`,
+                });
             }
-        });
+        }
     }
     catch (err) {
         res.status(500).send({
@@ -171,7 +189,6 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
     if (userData != null && league != null) {
         const { dota, steamID32 } = userData;
         const { startDate, endDate } = league;
-        // const league = League.find({}).then((allLeagues) => allLeagues[0]);
         // const recentMatches: { data: MatchData[] } = await axios.get(
         //   `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
         // );
@@ -179,10 +196,10 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
         const isPremiumActive = userData.premium.isPremiumActive;
         const premiumGamesLeft = userData.premium.premiumGamesLeft;
         const hasBonusMatch = isPremiumActive && premiumGamesLeft > 0;
+        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === dota.latestGameId);
         // const fromThisGame = recentMatches.data.findIndex(
-        //   (match) => match.match_id === dota.latestGameId
+        //   (match) => match.match_id === 7523323314
         // );
-        const fromThisGame = recentMatches.data.findIndex((match) => match.match_id === 7523323314);
         const newGames = recentMatches.data.slice(0, fromThisGame);
         if (newGames.length > 0) {
             //DO CALCULATION HERE

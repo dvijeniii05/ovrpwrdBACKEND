@@ -4,7 +4,7 @@
   "description": "backend for OVRPWRD.app",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./build/steamAuth.js",
+    "start": "nodemon ./build/App.js",
     "build": "npx tsc"
   },
   "author": "dvijeniii05",

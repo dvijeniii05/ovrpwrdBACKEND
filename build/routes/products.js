@@ -20,7 +20,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const uuid_1 = require("uuid");
 const User_1 = __importDefault(require("../models/User"));
 const telegraf_1 = require("telegraf");
-const steamAuth_1 = require("../steamAuth");
+const App_1 = require("../App");
 exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 // THIS TO BE MOVED TO PRODUCT PURCAHSING CALL
@@ -34,11 +34,23 @@ exports.router.post("/addNewProducts", jsonParser, (req, res) => __awaiter(void 
     const productSecret = req.headers["authorization"];
     if (productSecret === process.env.PRODUCT_SECRET) {
         const receivedProducts = req.body;
-        receivedProducts.map((singleProduct) => {
-            const newProduct = new Product_1.default(Object.assign({ uniqueId: (0, uuid_1.v4)() }, singleProduct));
-            newProduct.save();
-        });
-        res.status(200).send("All products added");
+        let error;
+        for (let i = 0; i < receivedProducts.length; i++) {
+            const newProduct = new Product_1.default(Object.assign({ uniqueId: (0, uuid_1.v4)() }, receivedProducts[i]));
+            error = newProduct.validateSync();
+            if (error) {
+                break;
+            }
+            else {
+                yield newProduct.save();
+            }
+        }
+        if (error) {
+            res.status(500).send(error.message);
+        }
+        else {
+            res.status(200).send("All products added");
+        }
     }
 }));
 exports.router.patch("/buyProduct", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -77,7 +89,7 @@ exports.router.patch("/buyProduct", jsonParser, (req, res) => __awaiter(void 0, 
                     productLink,
                 });
                 yield user.save();
-                bot.telegram.sendMessage(steamAuth_1.marketplaceChatId, `Product purchased: 
+                bot.telegram.sendMessage(App_1.marketplaceChatId, `Product purchased: 
           name -> ${productName},
           brand -> ${productBrand}, 
           price -> ${price}, 

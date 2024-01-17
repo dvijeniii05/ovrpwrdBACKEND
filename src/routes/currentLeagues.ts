@@ -47,15 +47,23 @@ router.patch("/", jsonParser, async (req, res) => {
     // });
     const rawLeague = req.body;
     const filter = { leagueName: rawLeague.leagueName };
-    League.findOneAndReplace(filter, rawLeague).then((league) => {
-      if (league) {
-        res.status(200).send({
-          message: "League details updated successfully",
-        });
-      } else {
-        res.status(404).send({ message: "League with a given name not found" });
-      }
-    });
+    try {
+      const validateBody = await League.validate(rawLeague);
+      League.findOneAndReplace(filter, rawLeague).then((league) => {
+        if (league) {
+          res.status(200).send({
+            message: "League details updated successfully",
+          });
+        } else {
+          console.log("NO_NAME", filter);
+          res
+            .status(404)
+            .send({ message: "League with a given name not found" });
+        }
+      });
+    } catch (err) {
+      res.status(500).send(err);
+    }
   } else {
     res.status(403).send({ message: "Access restricted" });
   }

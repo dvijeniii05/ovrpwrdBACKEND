@@ -1,1 +1,1 @@
-web: node ./build/steamAuth.js
+web: node ./build/App.js

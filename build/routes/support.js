@@ -16,7 +16,7 @@ exports.router = void 0;
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_1 = __importDefault(require("express"));
 const telegraf_1 = require("telegraf");
-const steamAuth_1 = require("../steamAuth");
+const App_1 = require("../App");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
@@ -26,7 +26,7 @@ exports.router.post("/reportNickname", jsonParser, (req, res) => __awaiter(void 
     const { nickname } = req.body;
     console.log("NICK_TO_REPORT", nickname);
     try {
-        bot.telegram.sendMessage(steamAuth_1.supportChatId, `Reported nickname: ${nickname}`);
+        bot.telegram.sendMessage(App_1.supportChatId, `Reported nickname: ${nickname}`);
         console.log("NICK_TO_REPORT", nickname);
         res.status(200).send();
     }
@@ -40,7 +40,7 @@ exports.router.get("/deleteAccount", (req, res) => __awaiter(void 0, void 0, voi
     const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
     const email = decoded.userEmail;
     try {
-        bot.telegram.sendMessage(steamAuth_1.accountDeletionChatId, `Delete Account: ${email}`);
+        bot.telegram.sendMessage(App_1.accountDeletionChatId, `Delete Account: ${email}`);
         console.log("Account to Delete", email);
         res.status(200).send();
     }
