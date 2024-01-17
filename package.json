@@ -5,7 +5,7 @@
   "main": "App.js",
   "scripts": {
     "start": "nodemon ./build/App.js",
-    "build:digitalocean": "npx tsc && npm start"
+    "build": "npx tsc && npm start"
   },
   "author": "dvijeniii05",
   "license": "ISC",
