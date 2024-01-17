@@ -2,7 +2,7 @@
   "name": "ovrpwrd.backend",
   "version": "1.0.0",
   "description": "backend for OVRPWRD.app",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "nodemon ./build/App.js",
     "build": "npx tsc"
