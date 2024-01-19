@@ -224,11 +224,11 @@ router.get("/getUserStats", async (req, res) => {
 
     const { startDate, endDate } = league;
 
-    // const recentMatches: { data: MatchData[] } = await axios.get(
-    //   `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
-    // );
+    const recentMatches: { data: MatchData[] } = await axios.get(
+      `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
+    );
 
-    const recentMatches: { data: MatchData[] } = dummyRecentMatches;
+    // const recentMatches: { data: MatchData[] } = dummyRecentMatches;
 
     const isPremiumActive = userData.premium.isPremiumActive;
     const premiumGamesLeft = userData.premium.premiumGamesLeft;
