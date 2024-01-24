@@ -16,7 +16,8 @@ import { router as premium } from "./routes/premium";
 import { router as appVersionCheck } from "./routes/appVersionCheck";
 
 export const devBaseUrl = `http://localhost:3000`;
-export const prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
+// export const prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
+export const prodBaseUrl = `https://ovrpwrd.app`;
 
 export const marketplaceChatId = "-4080601885";
 export const supportChatId = "-4032001652";
