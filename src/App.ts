@@ -17,14 +17,14 @@ import { router as appVersionCheck } from "./routes/appVersionCheck";
 
 export const devBaseUrl = `http://localhost:3000`;
 // export const prodBaseUrl = `https://ovrpwrd-backend-hmwpa.ondigitalocean.app`;
-export const prodBaseUrl = `https://ovrpwrd.app`;
+export const prodBaseUrl = `https://ovrpwrd-backend-5ljab.ondigitalocean.app`;
 
 export const marketplaceChatId = "-4080601885";
 export const supportChatId = "-4032001652";
 export const accountDeletionChatId = "-4018406128";
 
 const steam = new SteamAuth({
-  realm: `${prodBaseUrl}`, // Site name displayed to users on logon
+  realm: "Ovrpwrd.app", // Site name displayed to users on logon
   returnUrl: `${prodBaseUrl}/auth/steam/authenticate`, // Your return route
   apiKey: "D8B16689041256E8528ED5CFD72E1BFC", // Steam API key
 });
