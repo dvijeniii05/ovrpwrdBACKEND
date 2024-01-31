@@ -25,7 +25,7 @@ exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("BODY_CHECK", req.body);
-    const { nickname, email, fullName, dob, gender, country } = req.body;
+    const { nickname, email, fullName, dob, gender, country, appleUserId } = req.body;
     User_1.default.findOne({ nickname }).then((user) => {
         if (user) {
             console.log("user_already_exists");
@@ -36,6 +36,7 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
         else {
             const newUser = new User_1.default({
                 email,
+                appleUserId,
                 fullName,
                 nickname,
                 dob,
@@ -51,22 +52,44 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
         }
     });
 }));
-exports.router.get("/loginUser/:email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.params;
-    console.log("BODY_EMAIl", email);
-    User_1.default.findOne({ email }).then((user) => {
-        if (user) {
-            console.log("user_exists");
-            const jwtToken = jsonwebtoken_1.default.sign({ userEmail: email }, process.env.JWT_SECRET);
-            res
-                .status(200)
-                .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
-        }
-        else {
-            console.log("user_doesnt_exist");
-            res.status(404).send();
-        }
-    });
+exports.router.post("/loginUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    console.log("BODY_CHECK", body);
+    if (body.email !== null) {
+        const email = body.email;
+        console.log("BODY_EMAIl", email);
+        User_1.default.findOne({ email }).then((user) => {
+            if (user) {
+                console.log("user_exists");
+                const jwtToken = jsonwebtoken_1.default.sign({ userEmail: email }, process.env.JWT_SECRET);
+                res
+                    .status(200)
+                    .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+            }
+            else {
+                console.log("user_doesnt_exist");
+                res.status(404).send();
+            }
+        });
+    }
+    else {
+        const appleUserId = body.appleUserId;
+        console.log("APPLE_USER_ID", appleUserId);
+        // Same logic as with email but with appleUserId
+        User_1.default.findOne({ appleUserId }).then((user) => {
+            if (user) {
+                console.log("user_exists");
+                const jwtToken = jsonwebtoken_1.default.sign({ userEmail: appleUserId }, process.env.JWT_SECRET);
+                res
+                    .status(200)
+                    .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+            }
+            else {
+                console.log("user_doesnt_exist");
+                res.status(404).send();
+            }
+        });
+    }
 }));
 exports.router.patch("/updateUserDetails", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body;

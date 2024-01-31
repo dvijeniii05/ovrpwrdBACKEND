@@ -14,6 +14,10 @@ const UserSchema = new mongoose_1.default.Schema({
         required: true,
         default: false,
     },
+    appleUserId: {
+        type: String,
+        required: false,
+    },
     nickname: {
         type: String,
         required: false,

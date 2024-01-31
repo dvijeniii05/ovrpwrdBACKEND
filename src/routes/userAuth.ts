@@ -49,7 +49,8 @@ const jsonParser = bodyParser.json();
 
 router.post("/registerUser", jsonParser, async (req, res) => {
   console.log("BODY_CHECK", req.body);
-  const { nickname, email, fullName, dob, gender, country } = req.body;
+  const { nickname, email, fullName, dob, gender, country, appleUserId } =
+    req.body;
   User.findOne({ nickname }).then((user) => {
     if (user) {
       console.log("user_already_exists");
@@ -60,6 +61,7 @@ router.post("/registerUser", jsonParser, async (req, res) => {
     } else {
       const newUser = new User({
         email,
+        appleUserId,
         fullName,
         nickname,
         dob,
@@ -76,21 +78,47 @@ router.post("/registerUser", jsonParser, async (req, res) => {
   });
 });
 
-router.get("/loginUser/:email", async (req, res) => {
-  const { email } = req.params;
-  console.log("BODY_EMAIl", email);
-  User.findOne({ email }).then((user) => {
-    if (user) {
-      console.log("user_exists");
-      const jwtToken = jwt.sign({ userEmail: email }, process.env.JWT_SECRET!);
-      res
-        .status(200)
-        .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
-    } else {
-      console.log("user_doesnt_exist");
-      res.status(404).send();
-    }
-  });
+router.post("/loginUser", jsonParser, async (req, res) => {
+  const body = req.body;
+  if (body.email !== null) {
+    const email = body.email;
+    console.log("BODY_EMAIl", email);
+    User.findOne({ email }).then((user) => {
+      if (user) {
+        console.log("user_exists");
+        const jwtToken = jwt.sign(
+          { userEmail: email },
+          process.env.JWT_SECRET!
+        );
+        res
+          .status(200)
+          .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+      } else {
+        console.log("user_doesnt_exist");
+        res.status(404).send();
+      }
+    });
+  } else {
+    const appleUserId = body.appleUserId;
+    console.log("APPLE_USER_ID", appleUserId);
+    // Same logic as with email but with appleUserId
+
+    User.findOne({ appleUserId }).then((user) => {
+      if (user) {
+        console.log("user_exists");
+        const jwtToken = jwt.sign(
+          { userEmail: appleUserId },
+          process.env.JWT_SECRET!
+        );
+        res
+          .status(200)
+          .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+      } else {
+        console.log("user_doesnt_exist");
+        res.status(404).send();
+      }
+    });
+  }
 });
 
 router.patch("/updateUserDetails", jsonParser, async (req, res) => {
