@@ -26,7 +26,7 @@ exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("BODY_CHECK", req.body);
-    const { nickname, email, fullName, dob, gender, country, appleUserId } = req.body;
+    const { nickname, email, fullName, dob, gender, country, appleUserId, revUserId, } = req.body;
     User_1.default.findOne({ nickname }).then((user) => {
         if (user) {
             console.log("user_already_exists");
@@ -43,6 +43,7 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
                 dob,
                 gender,
                 country,
+                revUserId,
                 dota: {},
                 rewards: {},
                 premium: {},
@@ -62,9 +63,12 @@ exports.router.post("/loginUser", jsonParser, (req, res) => __awaiter(void 0, vo
             if (user) {
                 console.log("user_exists");
                 const jwtToken = jsonwebtoken_1.default.sign({ userEmail: email }, process.env.JWT_SECRET);
-                res
-                    .status(200)
-                    .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+                res.status(200).send({
+                    token: jwtToken,
+                    isFullyOnboarded: user.isFullyOnboarded,
+                    email,
+                    revUserId: user.revUserId,
+                });
             }
             else {
                 console.log("user_doesnt_exist");
@@ -80,9 +84,12 @@ exports.router.post("/loginUser", jsonParser, (req, res) => __awaiter(void 0, vo
             if (user) {
                 console.log("user_exists");
                 const jwtToken = jsonwebtoken_1.default.sign({ userEmail: user.email }, process.env.JWT_SECRET);
-                res
-                    .status(200)
-                    .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+                res.status(200).send({
+                    token: jwtToken,
+                    isFullyOnboarded: user.isFullyOnboarded,
+                    email: user.email,
+                    revUserId: user.revUserId,
+                });
             }
             else {
                 console.log("user_doesnt_exist");

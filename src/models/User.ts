@@ -14,6 +14,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  revUserId: {
+    type: String,
+    required: false,
+  },
   nickname: {
     type: String,
     required: false,

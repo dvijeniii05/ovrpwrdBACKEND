@@ -49,8 +49,16 @@ const jsonParser = bodyParser.json();
 
 router.post("/registerUser", jsonParser, async (req, res) => {
   console.log("BODY_CHECK", req.body);
-  const { nickname, email, fullName, dob, gender, country, appleUserId } =
-    req.body;
+  const {
+    nickname,
+    email,
+    fullName,
+    dob,
+    gender,
+    country,
+    appleUserId,
+    revUserId,
+  } = req.body;
   User.findOne({ nickname }).then((user) => {
     if (user) {
       console.log("user_already_exists");
@@ -67,6 +75,7 @@ router.post("/registerUser", jsonParser, async (req, res) => {
         dob,
         gender,
         country,
+        revUserId,
         dota: {},
         rewards: {},
         premium: {},
@@ -90,9 +99,12 @@ router.post("/loginUser", jsonParser, async (req, res) => {
           { userEmail: email },
           process.env.JWT_SECRET!
         );
-        res
-          .status(200)
-          .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+        res.status(200).send({
+          token: jwtToken,
+          isFullyOnboarded: user.isFullyOnboarded,
+          email,
+          revUserId: user.revUserId,
+        });
       } else {
         console.log("user_doesnt_exist");
         res.status(404).send();
@@ -110,9 +122,12 @@ router.post("/loginUser", jsonParser, async (req, res) => {
           { userEmail: user.email },
           process.env.JWT_SECRET!
         );
-        res
-          .status(200)
-          .send({ token: jwtToken, isFullyOnboarded: user.isFullyOnboarded });
+        res.status(200).send({
+          token: jwtToken,
+          isFullyOnboarded: user.isFullyOnboarded,
+          email: user.email,
+          revUserId: user.revUserId,
+        });
       } else {
         console.log("user_doesnt_exist");
         res.status(404).send();
