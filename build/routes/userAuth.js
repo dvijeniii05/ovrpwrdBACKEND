@@ -56,7 +56,7 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
 }));
 exports.router.post("/loginUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    if (body.email !== null) {
+    if (body.email) {
         const email = body.email;
         console.log("BODY_EMAIl", email);
         User_1.default.findOne({ email }).then((user) => {

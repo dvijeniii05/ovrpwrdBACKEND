@@ -89,7 +89,7 @@ router.post("/registerUser", jsonParser, async (req, res) => {
 
 router.post("/loginUser", jsonParser, async (req, res) => {
   const body = req.body;
-  if (body.email !== null) {
+  if (body.email) {
     const email = body.email;
     console.log("BODY_EMAIl", email);
     User.findOne({ email }).then((user) => {
