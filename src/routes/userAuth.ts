@@ -311,7 +311,6 @@ router.get("/getUserStats", async (req, res) => {
             userData.premium.isPremiumActive = false;
           } else {
             userData.premium.premiumGamesLeft -= 1;
-            userData.premium.hasPremium = false;
             userData.premium.isPremiumActive = false;
           }
         }

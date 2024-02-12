@@ -62,11 +62,6 @@ const UserSchema = new mongoose_1.default.Schema({
     },
     premium: {
         type: {
-            hasPremium: {
-                type: Boolean,
-                required: true,
-                default: false,
-            },
             isPremiumActive: {
                 type: Boolean,
                 required: true,

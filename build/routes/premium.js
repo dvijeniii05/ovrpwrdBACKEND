@@ -14,12 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = __importDefault(require("express"));
-const body_parser_1 = __importDefault(require("body-parser"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const flat_1 = require("flat");
 const User_1 = __importDefault(require("../models/User"));
 exports.router = express_1.default.Router();
-const jsonParser = body_parser_1.default.json();
 exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.headers["authorization"];
     console.log("Purchase_Premium");
@@ -29,7 +27,6 @@ exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0,
         const filter = { email };
         User_1.default.findOneAndUpdate(filter, (0, flat_1.flatten)({
             premium: {
-                hasPremium: true,
                 premiumGamesLeft: 10,
             },
         })).then((user) => {

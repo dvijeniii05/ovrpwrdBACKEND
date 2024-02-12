@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
 import { flatten } from "flat";
 import { TokenInterface } from "./userAuth";
@@ -7,10 +6,7 @@ import User from "../models/User";
 
 export const router = express.Router();
 
-const jsonParser = bodyParser.json();
-
 export interface PremiumRequestProps {
-  hasPremium?: boolean;
   isPremiumActive?: boolean;
 }
 
@@ -25,7 +21,6 @@ router.patch("/purchasePremium", async (req, res) => {
       filter,
       flatten({
         premium: {
-          hasPremium: true,
           premiumGamesLeft: 10,
         },
       })

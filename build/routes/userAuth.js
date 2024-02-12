@@ -249,7 +249,6 @@ exports.router.get("/getUserStats", (req, res) => __awaiter(void 0, void 0, void
                     }
                     else {
                         userData.premium.premiumGamesLeft -= 1;
-                        userData.premium.hasPremium = false;
                         userData.premium.isPremiumActive = false;
                     }
                 }
