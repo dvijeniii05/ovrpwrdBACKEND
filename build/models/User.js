@@ -72,6 +72,11 @@ const UserSchema = new mongoose_1.default.Schema({
                 required: true,
                 default: 0,
             },
+            lastPurchased: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
         },
         required: true,
     },

@@ -17,7 +17,9 @@ const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const flat_1 = require("flat");
 const User_1 = __importDefault(require("../models/User"));
+const body_parser_1 = __importDefault(require("body-parser"));
 exports.router = express_1.default.Router();
+const jsonParser = body_parser_1.default.json();
 exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.headers["authorization"];
     console.log("Purchase_Premium");
@@ -25,9 +27,11 @@ exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0,
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         const email = decoded.userEmail;
         const filter = { email };
+        const currentDateTime = new Date().getTime();
         User_1.default.findOneAndUpdate(filter, (0, flat_1.flatten)({
             premium: {
                 premiumGamesLeft: 10,
+                lastPurchased: currentDateTime,
             },
         })).then((user) => {
             if (user) {
@@ -37,6 +41,32 @@ exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0,
                 res.status(404).send({ message: "Error updating Premium Status" });
             }
         });
+    }
+    catch (err) {
+        console.log("Incorrect JWT", err);
+        res.status(500).send({
+            message: "Error during JWT token validation process",
+            error: err,
+        });
+    }
+}));
+exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers["authorization"];
+    const { newPurchaseTime } = req.body;
+    console.log("Update_Premium");
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const email = decoded.userEmail;
+        const filter = { email };
+        const userData = yield User_1.default.findOne(filter);
+        console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, newPurchaseTime);
+        if (userData != null && (userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased) < newPurchaseTime) {
+            console.log("Need_to_add_10");
+            userData.premium.premiumGamesLeft += 10;
+            userData.premium.lastPurchased = newPurchaseTime;
+            yield userData.save();
+        }
+        res.status(200).send({ message: "Premium Status updated" });
     }
     catch (err) {
         console.log("Incorrect JWT", err);

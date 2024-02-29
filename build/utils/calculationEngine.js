@@ -9,6 +9,7 @@ const calculation = (recentMatches, hasBonusMatch, leagueStartDate, leagueEndDat
         var _a;
         const isWithinLeaguePeriod = singleMatch.start_time > leagueStartDate &&
             singleMatch.start_time < leagueEndDate;
+        console.log("IS_WITHIN+LEAGUE", isWithinLeaguePeriod);
         const isBonusMatch = hasBonusMatch && index === recentMatches.length - 1;
         const bonusMultiplier = isBonusMatch ? 2 : 1;
         const isTurboOrRanking = singleMatch.game_mode == 22 || singleMatch.game_mode == 23;
