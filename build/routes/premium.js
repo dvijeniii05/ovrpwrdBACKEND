@@ -28,6 +28,7 @@ exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0,
         const email = decoded.userEmail;
         const filter = { email };
         const currentDateTime = new Date().getTime();
+        //Change logic below to add 10 boosters to current boosters instead of just setting to 10.
         User_1.default.findOneAndUpdate(filter, (0, flat_1.flatten)({
             premium: {
                 premiumGamesLeft: 10,

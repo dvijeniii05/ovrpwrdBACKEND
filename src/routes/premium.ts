@@ -21,21 +21,16 @@ router.patch("/purchasePremium", async (req, res) => {
     const email = (decoded as TokenInterface).userEmail;
     const filter = { email };
     const currentDateTime = new Date().getTime();
-    User.findOneAndUpdate(
-      filter,
-      flatten({
-        premium: {
-          premiumGamesLeft: 10,
-          lastPurchased: currentDateTime,
-        },
-      })
-    ).then((user) => {
-      if (user) {
-        res.status(200).send({ message: "Premium Status updated" });
-      } else {
-        res.status(404).send({ message: "Error updating Premium Status" });
-      }
-    });
+
+    const userData = await User.findOne(filter);
+    if (userData != null) {
+      userData.premium.premiumGamesLeft += 10;
+      userData.premium.lastPurchased = currentDateTime;
+      userData.save();
+      res.status(200).send({ message: "Premium Status updated" });
+    } else {
+      res.status(404).send({ message: "Error updating Premium Status" });
+    }
   } catch (err) {
     console.log("Incorrect JWT", err);
     res.status(500).send({
