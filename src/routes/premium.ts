@@ -24,6 +24,7 @@ router.patch("/purchasePremium", async (req, res) => {
 
     const userData = await User.findOne(filter);
     if (userData != null) {
+      console.log("TIME_OF_PURCHASE", currentDateTime);
       userData.premium.premiumGamesLeft += 10;
       userData.premium.lastPurchased = currentDateTime;
       userData.save();

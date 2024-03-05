@@ -28,20 +28,17 @@ exports.router.patch("/purchasePremium", (req, res) => __awaiter(void 0, void 0,
         const email = decoded.userEmail;
         const filter = { email };
         const currentDateTime = new Date().getTime();
-        //Change logic below to add 10 boosters to current boosters instead of just setting to 10.
-        User_1.default.findOneAndUpdate(filter, (0, flat_1.flatten)({
-            premium: {
-                premiumGamesLeft: 10,
-                lastPurchased: currentDateTime,
-            },
-        })).then((user) => {
-            if (user) {
-                res.status(200).send({ message: "Premium Status updated" });
-            }
-            else {
-                res.status(404).send({ message: "Error updating Premium Status" });
-            }
-        });
+        const userData = yield User_1.default.findOne(filter);
+        if (userData != null) {
+            console.log("TIME_OF_PURCHASE", currentDateTime);
+            userData.premium.premiumGamesLeft += 10;
+            userData.premium.lastPurchased = currentDateTime;
+            userData.save();
+            res.status(200).send({ message: "Premium Status updated" });
+        }
+        else {
+            res.status(404).send({ message: "Error updating Premium Status" });
+        }
     }
     catch (err) {
         console.log("Incorrect JWT", err);
