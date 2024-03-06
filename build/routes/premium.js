@@ -60,7 +60,7 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
         console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, newPurchaseTime, cancelationTime);
         if (userData != null) {
             const canceledAfterSevenDays = cancelationTime - (userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased) < 604800;
-            if (canceledAfterSevenDays) {
+            if (cancelationTime > 0 && canceledAfterSevenDays) {
                 console.log("Canceled_After_Seven_Days", cancelationTime);
                 userData.premium.premiumGamesLeft -= 10;
                 userData.premium.lastPurchased = cancelationTime;

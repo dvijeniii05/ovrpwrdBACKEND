@@ -60,7 +60,7 @@ router.post("/updatePremium", jsonParser, async (req, res) => {
       const canceledAfterSevenDays =
         cancelationTime - userData?.premium.lastPurchased < 604800;
 
-      if (canceledAfterSevenDays) {
+      if (cancelationTime > 0 && canceledAfterSevenDays) {
         console.log("Canceled_After_Seven_Days", cancelationTime);
         userData.premium.premiumGamesLeft -= 10;
         userData.premium.lastPurchased = cancelationTime;
