@@ -49,16 +49,8 @@ const jsonParser = bodyParser.json();
 
 router.post("/registerUser", jsonParser, async (req, res) => {
   console.log("BODY_CHECK", req.body);
-  const {
-    nickname,
-    email,
-    fullName,
-    dob,
-    gender,
-    country,
-    appleUserId,
-    revUserId,
-  } = req.body;
+  const { nickname, email, dob, gender, country, appleUserId, revUserId } =
+    req.body;
   User.findOne({ nickname }).then((user) => {
     if (user) {
       console.log("user_already_exists");
@@ -70,7 +62,6 @@ router.post("/registerUser", jsonParser, async (req, res) => {
       const newUser = new User({
         email,
         appleUserId,
-        fullName,
         nickname,
         dob,
         gender,
@@ -171,7 +162,6 @@ router.get("/getUserDetails", async (req, res) => {
   User.findOne({ email }, [
     "email",
     "nickname",
-    "fullName",
     "dob",
     "avatar",
     "steamID32",

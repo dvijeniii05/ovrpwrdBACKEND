@@ -25,7 +25,7 @@ exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("BODY_CHECK", req.body);
-    const { nickname, email, fullName, dob, gender, country, appleUserId, revUserId, } = req.body;
+    const { nickname, email, dob, gender, country, appleUserId, revUserId } = req.body;
     User_1.default.findOne({ nickname }).then((user) => {
         if (user) {
             console.log("user_already_exists");
@@ -37,7 +37,6 @@ exports.router.post("/registerUser", jsonParser, (req, res) => __awaiter(void 0,
             const newUser = new User_1.default({
                 email,
                 appleUserId,
-                fullName,
                 nickname,
                 dob,
                 gender,
@@ -132,7 +131,6 @@ exports.router.get("/getUserDetails", (req, res) => __awaiter(void 0, void 0, vo
     User_1.default.findOne({ email }, [
         "email",
         "nickname",
-        "fullName",
         "dob",
         "avatar",
         "steamID32",

@@ -26,10 +26,6 @@ const UserSchema = new mongoose_1.default.Schema({
         type: String,
         required: false,
     },
-    fullName: {
-        type: String,
-        required: false,
-    },
     dob: {
         type: String,
         required: false,
