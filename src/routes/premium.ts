@@ -43,23 +43,38 @@ const jsonParser = bodyParser.json();
 
 router.post("/updatePremium", jsonParser, async (req, res) => {
   const token = req.headers["authorization"] as string;
-  const { newPurchaseTime } = req.body;
+  const { hasActiveEntitelement, isIos, entitlements } = req.body;
   console.log("Update_Premium");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     const email = (decoded as TokenInterface).userEmail;
     const filter = { email };
     const userData = await User.findOne(filter);
+
     console.log(
       "UPDATE_PREMIUM_CHECK",
       userData?.premium.lastPurchased,
-      newPurchaseTime
+      hasActiveEntitelement,
+      isIos,
+      entitlements
     );
+    if (userData != null) {
+      //NEW LOGIC INSIDE HERE
+      userData.premium.hasPremium = hasActiveEntitelement;
+      // const dynamicCustomEntitelment =
+      if (hasActiveEntitelement) {
+        const dynamicCustomEntitelment = isIos
+          ? entitlements.active.premium
+          : entitlements.active.premium_android;
 
-    if (userData != null && userData?.premium.lastPurchased < newPurchaseTime) {
-      console.log("Need_to_add_10");
-      userData.premium.premiumGamesLeft += 10;
-      userData.premium.lastPurchased = newPurchaseTime;
+        const newPurchaseTime =
+          dynamicCustomEntitelment.latestPurchaseDateMillis;
+        if (userData.premium.lastPurchased < newPurchaseTime) {
+          console.log("Need_to_add_10");
+          userData.premium.premiumGamesLeft += 10;
+          userData.premium.lastPurchased = newPurchaseTime;
+        }
+      }
       await userData.save();
     }
 

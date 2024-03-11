@@ -258,24 +258,24 @@ router.get("/getUserStats", async (req, res) => {
 
     const { startDate, endDate } = league;
 
-    const recentMatches: { data: MatchData[] } = await axios.get(
-      `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
-    );
+    // const recentMatches: { data: MatchData[] } = await axios.get(
+    //   `${openDotaApi}/players/${steamID32}/matches?significant=0&limit=100&project=hero_damage&project=hero_healing&project=kills&project=deaths&project=assists&project=start_time&project=duration&project=game_mode&project=hero_id&project=last_hits`
+    // );
 
-    // const recentMatches: { data: MatchData[] } = dummyRecentMatches;
+    const recentMatches: { data: MatchData[] } = dummyRecentMatches;
 
     const isPremiumActive = userData.premium.isPremiumActive;
     const premiumGamesLeft = userData.premium.premiumGamesLeft;
 
     const hasBonusMatch = isPremiumActive && premiumGamesLeft > 0;
 
-    const fromThisGame = recentMatches.data.findIndex(
-      (match) => match.match_id === dota.latestGameId
-    );
-
     // const fromThisGame = recentMatches.data.findIndex(
-    //   (match) => match.match_id === 7523323314
+    //   (match) => match.match_id === dota.latestGameId
     // );
+
+    const fromThisGame = recentMatches.data.findIndex(
+      (match) => match.match_id === 7523323314
+    );
 
     const newGames = recentMatches.data.slice(0, fromThisGame);
     if (newGames.length > 0) {

@@ -48,18 +48,29 @@ const jsonParser = body_parser_1.default.json();
 // });
 exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.headers["authorization"];
-    const { newPurchaseTime } = req.body;
+    const { hasActiveEntitelement, isIos, entitlements } = req.body;
     console.log("Update_Premium");
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         const email = decoded.userEmail;
         const filter = { email };
         const userData = yield User_1.default.findOne(filter);
-        console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, newPurchaseTime);
-        if (userData != null && (userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased) < newPurchaseTime) {
-            console.log("Need_to_add_10");
-            userData.premium.premiumGamesLeft += 10;
-            userData.premium.lastPurchased = newPurchaseTime;
+        console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, hasActiveEntitelement, isIos, entitlements);
+        if (userData != null) {
+            //NEW LOGIC INSIDE HERE
+            userData.premium.hasPremium = hasActiveEntitelement;
+            // const dynamicCustomEntitelment =
+            if (hasActiveEntitelement) {
+                const dynamicCustomEntitelment = isIos
+                    ? entitlements.active.premium
+                    : entitlements.active.premium_android;
+                const newPurchaseTime = dynamicCustomEntitelment.latestPurchaseDateMillis;
+                if (userData.premium.lastPurchased < newPurchaseTime) {
+                    console.log("Need_to_add_10");
+                    userData.premium.premiumGamesLeft += 10;
+                    userData.premium.lastPurchased = newPurchaseTime;
+                }
+            }
             yield userData.save();
         }
         res.status(200).send({ message: "Premium Status updated" });
