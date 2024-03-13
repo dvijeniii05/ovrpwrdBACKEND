@@ -4,6 +4,7 @@ import { flatten } from "flat";
 import { TokenInterface } from "./userAuth";
 import User from "../models/User";
 import bodyParser from "body-parser";
+import axios from "axios";
 
 export const router = express.Router();
 
@@ -51,38 +52,78 @@ router.post("/updatePremium", jsonParser, async (req, res) => {
     const filter = { email };
     const userData = await User.findOne(filter);
 
+    const dynamicEntitlementString = isIos ? "premium" : "premium_android";
+
     console.log(
       "UPDATE_PREMIUM_CHECK",
       userData?.premium.lastPurchased,
       hasActiveEntitelement,
-      isIos,
-      entitlements
+      isIos
     );
     if (userData != null) {
+      const updatedUserInfo = await axios.get(
+        `https://api.revenuecat.com/v1/subscribers/${userData.revUserId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REV_CAT_KEY!}`,
+          },
+        }
+      );
+      const lastActiveProductId =
+        updatedUserInfo.data.subscriber.entitlements[dynamicEntitlementString]
+          .product_identifier;
+
+      const shouldRefund =
+        updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]
+          .refunded_at !== null;
+      const latestRefundTransactionId =
+        updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]
+          .store_transaction_id;
+
+      console.log("RESPONSE_FROM_REV_CAT", lastActiveProductId);
+
+      console.log("IS_REFUNDED?", shouldRefund);
+
       //NEW LOGIC INSIDE HERE
       userData.premium.hasPremium = hasActiveEntitelement;
-      // const dynamicCustomEntitelment =
-      if (hasActiveEntitelement) {
-        const dynamicCustomEntitelment = isIos
-          ? entitlements.active.premium
-          : entitlements.active.premium_android;
+      if (
+        shouldRefund &&
+        latestRefundTransactionId !== userData.premium.refundTransactionId
+      ) {
+        const isMonthlySub = !lastActiveProductId.includes("1y");
+        userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
+        userData.premium.refundTransactionId = latestRefundTransactionId;
+        await userData.save();
+        res.status(200).send({ message: "Successful refund" });
+      } else {
+        if (hasActiveEntitelement) {
+          const dynamicCustomEntitelment = isIos
+            ? entitlements.active.premium
+            : entitlements.active.premium_android;
 
-        const newPurchaseTime =
-          dynamicCustomEntitelment.latestPurchaseDateMillis;
-        if (userData.premium.lastPurchased < newPurchaseTime) {
-          console.log("Need_to_add_10");
-          userData.premium.premiumGamesLeft += 10;
-          userData.premium.lastPurchased = newPurchaseTime;
+          const isMonthlySub =
+            !dynamicCustomEntitelment.productIdentifier.includes("1y");
+          console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
+          const newPurchaseTime =
+            dynamicCustomEntitelment.latestPurchaseDateMillis;
+          if (userData.premium.lastPurchased < newPurchaseTime) {
+            console.log("Need_to_add_10");
+            userData.premium.premiumGamesLeft += isMonthlySub ? 10 : 120;
+            userData.premium.lastPurchased = newPurchaseTime;
+          }
         }
+        await userData.save();
+        res.status(200).send({ message: "Premium Status updated" });
       }
-      await userData.save();
+    } else {
+      res.status(404).send({
+        message: "User not found",
+      });
     }
-
-    res.status(200).send({ message: "Premium Status updated" });
   } catch (err) {
     console.log("Incorrect JWT", err);
     res.status(500).send({
-      message: "Error during JWT token validation process",
+      message: "Error while updating premium status",
       error: err,
     });
   }

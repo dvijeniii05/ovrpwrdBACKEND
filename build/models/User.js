@@ -78,6 +78,10 @@ const UserSchema = new mongoose_1.default.Schema({
                 required: true,
                 default: 0,
             },
+            refundTransactionId: {
+                type: String,
+                required: false,
+            },
         },
         required: true,
     },

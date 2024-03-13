@@ -74,6 +74,10 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default: 0,
       },
+      refundTransactionId: {
+        type: String,
+        required: false,
+      },
     },
     required: true,
   },

@@ -18,6 +18,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const flat_1 = require("flat");
 const User_1 = __importDefault(require("../models/User"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const axios_1 = __importDefault(require("axios"));
 exports.router = express_1.default.Router();
 const jsonParser = body_parser_1.default.json();
 // router.patch("/purchasePremium", async (req, res) => {
@@ -55,30 +56,61 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
         const email = decoded.userEmail;
         const filter = { email };
         const userData = yield User_1.default.findOne(filter);
+        const dynamicEntitlementString = isIos ? "premium" : "premium_android";
         console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, hasActiveEntitelement, isIos, entitlements);
         if (userData != null) {
+            const updatedUserInfo = yield axios_1.default.get(`https://api.revenuecat.com/v1/subscribers/${userData.revUserId}`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.REV_CAT_KEY}`,
+                },
+            });
+            const lastActiveProductId = updatedUserInfo.data.subscriber.entitlements[dynamicEntitlementString]
+                .product_identifier;
+            const shouldRefund = updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]
+                .refunded_at !== null;
+            const latestRefundTransactionId = updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]
+                .store_transaction_id;
+            console.log("RESPONSE_FROM_REV_CAT", lastActiveProductId);
+            console.log("CORRECT_SUB", updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]);
+            console.log("IS_REFUNDED?", shouldRefund);
             //NEW LOGIC INSIDE HERE
             userData.premium.hasPremium = hasActiveEntitelement;
-            // const dynamicCustomEntitelment =
-            if (hasActiveEntitelement) {
-                const dynamicCustomEntitelment = isIos
-                    ? entitlements.active.premium
-                    : entitlements.active.premium_android;
-                const newPurchaseTime = dynamicCustomEntitelment.latestPurchaseDateMillis;
-                if (userData.premium.lastPurchased < newPurchaseTime) {
-                    console.log("Need_to_add_10");
-                    userData.premium.premiumGamesLeft += 10;
-                    userData.premium.lastPurchased = newPurchaseTime;
-                }
+            if (shouldRefund &&
+                latestRefundTransactionId !== userData.premium.refundTransactionId) {
+                const isMonthlySub = !lastActiveProductId.includes("1y");
+                userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
+                userData.premium.refundTransactionId = latestRefundTransactionId;
+                yield userData.save();
+                res.status(200).send({ message: "Successful refund" });
             }
-            yield userData.save();
+            else {
+                if (hasActiveEntitelement) {
+                    const dynamicCustomEntitelment = isIos
+                        ? entitlements.active.premium
+                        : entitlements.active.premium_android;
+                    const isMonthlySub = !dynamicCustomEntitelment.productIdentifier.includes("1y");
+                    console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
+                    const newPurchaseTime = dynamicCustomEntitelment.latestPurchaseDateMillis;
+                    if (userData.premium.lastPurchased < newPurchaseTime) {
+                        console.log("Need_to_add_10");
+                        userData.premium.premiumGamesLeft += isMonthlySub ? 10 : 120;
+                        userData.premium.lastPurchased = newPurchaseTime;
+                    }
+                }
+                yield userData.save();
+                res.status(200).send({ message: "Premium Status updated" });
+            }
         }
-        res.status(200).send({ message: "Premium Status updated" });
+        else {
+            res.status(404).send({
+                message: "User not found",
+            });
+        }
     }
     catch (err) {
         console.log("Incorrect JWT", err);
         res.status(500).send({
-            message: "Error during JWT token validation process",
+            message: "Error while updating premium status",
             error: err,
         });
     }
