@@ -88,7 +88,8 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
                     const dynamicCustomEntitelment = isIos
                         ? entitlements.active.premium
                         : entitlements.active.premium_android;
-                    const isMonthlySub = !dynamicCustomEntitelment.productIdentifier.includes("1y");
+                    const isMonthlySub = !dynamicCustomEntitelment.productIdentifier.includes("1y") ||
+                        !dynamicCustomEntitelment.productIdentifier.includes("yearly");
                     console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
                     const newPurchaseTime = dynamicCustomEntitelment.latestPurchaseDateMillis;
                     if (userData.premium.lastPurchased < newPurchaseTime) {

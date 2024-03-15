@@ -104,7 +104,8 @@ router.post("/updatePremium", jsonParser, async (req, res) => {
             : entitlements.active.premium_android;
 
           const isMonthlySub =
-            !dynamicCustomEntitelment.productIdentifier.includes("1y");
+            !dynamicCustomEntitelment.productIdentifier.includes("1y") ||
+            !dynamicCustomEntitelment.productIdentifier.includes("yearly");
           console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
           const newPurchaseTime =
             dynamicCustomEntitelment.latestPurchaseDateMillis;
