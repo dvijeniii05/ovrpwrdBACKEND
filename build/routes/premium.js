@@ -57,7 +57,7 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
         const filter = { email };
         const userData = yield User_1.default.findOne(filter);
         const dynamicEntitlementString = isIos ? "premium" : "premium_android";
-        console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, hasActiveEntitelement, isIos, entitlements);
+        console.log("UPDATE_PREMIUM_CHECK", userData === null || userData === void 0 ? void 0 : userData.premium.lastPurchased, hasActiveEntitelement, isIos);
         if (userData != null) {
             const updatedUserInfo = yield axios_1.default.get(`https://api.revenuecat.com/v1/subscribers/${userData.revUserId}`, {
                 headers: {
@@ -71,13 +71,13 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
             const latestRefundTransactionId = updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]
                 .store_transaction_id;
             console.log("RESPONSE_FROM_REV_CAT", lastActiveProductId);
-            console.log("CORRECT_SUB", updatedUserInfo.data.subscriber.subscriptions[lastActiveProductId]);
             console.log("IS_REFUNDED?", shouldRefund);
             //NEW LOGIC INSIDE HERE
             userData.premium.hasPremium = hasActiveEntitelement;
             if (shouldRefund &&
                 latestRefundTransactionId !== userData.premium.refundTransactionId) {
-                const isMonthlySub = !lastActiveProductId.includes("1y");
+                const isMonthlySub = !lastActiveProductId.includes("1y") ||
+                    !lastActiveProductId.includes("yearly");
                 userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
                 userData.premium.refundTransactionId = latestRefundTransactionId;
                 yield userData.save();

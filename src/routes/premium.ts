@@ -90,7 +90,9 @@ router.post("/updatePremium", jsonParser, async (req, res) => {
         shouldRefund &&
         latestRefundTransactionId !== userData.premium.refundTransactionId
       ) {
-        const isMonthlySub = !lastActiveProductId.includes("1y");
+        const isMonthlySub =
+          !lastActiveProductId.includes("1y") ||
+          !lastActiveProductId.includes("yearly");
         userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
         userData.premium.refundTransactionId = latestRefundTransactionId;
         await userData.save();
