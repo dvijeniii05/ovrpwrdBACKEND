@@ -76,7 +76,7 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
             userData.premium.hasPremium = hasActiveEntitelement;
             if (shouldRefund &&
                 latestRefundTransactionId !== userData.premium.refundTransactionId) {
-                const isMonthlySub = !lastActiveProductId.includes("1y") ||
+                const isMonthlySub = !lastActiveProductId.includes("1y") &&
                     !lastActiveProductId.includes("yearly");
                 userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
                 userData.premium.refundTransactionId = latestRefundTransactionId;
@@ -88,7 +88,7 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
                     const dynamicCustomEntitelment = isIos
                         ? entitlements.active.premium
                         : entitlements.active.premium_android;
-                    const isMonthlySub = !dynamicCustomEntitelment.productIdentifier.includes("1y") ||
+                    const isMonthlySub = !dynamicCustomEntitelment.productIdentifier.includes("1y") &&
                         !dynamicCustomEntitelment.productIdentifier.includes("yearly");
                     console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
                     const newPurchaseTime = dynamicCustomEntitelment.latestPurchaseDateMillis;
