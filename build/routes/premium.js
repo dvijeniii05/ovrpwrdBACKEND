@@ -77,7 +77,7 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
             if (shouldRefund &&
                 latestRefundTransactionId !== userData.premium.refundTransactionId) {
                 const isMonthlySub = !lastActiveProductId.includes("1y") &&
-                    !lastActiveProductId.includes("yearly");
+                    !lastActiveProductId.includes("year");
                 userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
                 userData.premium.refundTransactionId = latestRefundTransactionId;
                 yield userData.save();
@@ -89,8 +89,8 @@ exports.router.post("/updatePremium", jsonParser, (req, res) => __awaiter(void 0
                         ? entitlements.active.premium
                         : entitlements.active.premium_android;
                     const isMonthlySub = !dynamicCustomEntitelment.productIdentifier.includes("1y") &&
-                        !dynamicCustomEntitelment.productIdentifier.includes("yearly");
-                    console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
+                        !dynamicCustomEntitelment.productIdentifier.includes("year");
+                    console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub, dynamicCustomEntitelment.productIdentifier);
                     const newPurchaseTime = dynamicCustomEntitelment.latestPurchaseDateMillis;
                     if (userData.premium.lastPurchased < newPurchaseTime) {
                         console.log("Need_to_add_10");

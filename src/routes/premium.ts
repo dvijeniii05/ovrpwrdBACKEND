@@ -92,7 +92,7 @@ router.post("/updatePremium", jsonParser, async (req, res) => {
       ) {
         const isMonthlySub =
           !lastActiveProductId.includes("1y") &&
-          !lastActiveProductId.includes("yearly");
+          !lastActiveProductId.includes("year");
         userData.premium.premiumGamesLeft -= isMonthlySub ? 10 : 120;
         userData.premium.refundTransactionId = latestRefundTransactionId;
         await userData.save();
@@ -105,8 +105,12 @@ router.post("/updatePremium", jsonParser, async (req, res) => {
 
           const isMonthlySub =
             !dynamicCustomEntitelment.productIdentifier.includes("1y") &&
-            !dynamicCustomEntitelment.productIdentifier.includes("yearly");
-          console.log("IS_MONTHLY_SUBSCRIPTION?", isMonthlySub);
+            !dynamicCustomEntitelment.productIdentifier.includes("year");
+          console.log(
+            "IS_MONTHLY_SUBSCRIPTION?",
+            isMonthlySub,
+            dynamicCustomEntitelment.productIdentifier
+          );
           const newPurchaseTime =
             dynamicCustomEntitelment.latestPurchaseDateMillis;
           if (userData.premium.lastPurchased < newPurchaseTime) {
